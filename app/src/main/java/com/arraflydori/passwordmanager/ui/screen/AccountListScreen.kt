@@ -2,7 +2,6 @@ package com.arraflydori.passwordmanager.ui.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
@@ -40,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.arraflydori.passwordmanager.model.Account
+import com.arraflydori.passwordmanager.ui.composable.MyTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,36 +50,19 @@ fun AccountListScreen(
 
     Scaffold(
         topBar = {
-            BasicTextField(
+            MyTextField(
                 value = search,
                 onValueChange = {
                     search = it
                     // TODO: Implement search
                 },
-                maxLines = 1,
-                decorationBox = { innerTextField ->
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(
-                                color = Color.LightGray.copy(alpha = 0.5f),
-                                shape = RoundedCornerShape(percent = 40)
-                            )
-                            .padding(16.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            innerTextField()
-                            if (search.isEmpty()) {
-                                Text(
-                                    "Search",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                        Icon(Icons.Default.Search, contentDescription = "Search")
-                    }
+                hint = "Search",
+                trailing = {
+                    Icon(
+                        Icons.Default.Search,
+                        contentDescription = "Search account",
+                        modifier = Modifier.size(16.dp)
+                    )
                 },
                 modifier = Modifier
                     .statusBarsPadding()

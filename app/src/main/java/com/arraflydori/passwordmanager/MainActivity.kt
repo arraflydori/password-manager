@@ -65,8 +65,10 @@ fun App() {
                 val route = it.toRoute<AccountDetail>()
                 AccountDetailScreen(
                     account = sampleAccounts.first { it.id == route.id },
-                    onSave = {},
-                    onNavigateBack = {
+                    onSave = {
+                        // TODO: Implement save account
+                    },
+                    onBack = {
                         navController.popBackStack()
                     },
                 )

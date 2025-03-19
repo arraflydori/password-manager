@@ -7,23 +7,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,13 +33,14 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.arraflydori.passwordmanager.model.Account
+import com.arraflydori.passwordmanager.ui.composable.MyTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountDetailScreen(
     account: Account,
     onSave: (Account) -> Unit,
-    onNavigateBack: () -> Unit
+    onBack: () -> Unit,
 ) {
     var platformName by remember { mutableStateOf(account.platformName) }
     var username by remember { mutableStateOf(account.username ?: "") }
@@ -52,19 +51,17 @@ fun AccountDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Account Details") },
+                title = {
+                    Text("Account")
+                },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.Default.ChevronLeft,
                             contentDescription = "Go back"
                         )
                     }
                 },
-                colors = TopAppBarDefaults.smallTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                )
             )
         }
     ) { paddingValues ->
@@ -76,45 +73,40 @@ fun AccountDetailScreen(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Platform Name Field
-            OutlinedTextField(
+            MyTextField(
                 value = platformName,
                 onValueChange = { platformName = it },
-                label = { Text("Platform Name") },
+                hint = "Platform",
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
             )
-
-            // Username Field
-            OutlinedTextField(
+            MyTextField(
                 value = username,
                 onValueChange = { username = it },
-                label = { Text("Username") },
+                hint = "Username",
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
-
-            // Email Field
-            OutlinedTextField(
+            MyTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email") },
+                hint = "Email",
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
             )
-
-            // Password Field
-            OutlinedTextField(
+            MyTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Password") },
+                hint = "Password",
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                trailingIcon = {
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                trailing = {
+                    IconButton(
+                        onClick = { passwordVisible = !passwordVisible },
+                        modifier = Modifier.size(16.dp)
+                    ) {
                         Icon(
                             imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
                             contentDescription = if (passwordVisible) "Hide password" else "Show password"
@@ -122,10 +114,7 @@ fun AccountDetailScreen(
                     }
                 }
             )
-
             Spacer(modifier = Modifier.weight(1f))
-
-            // Save Button
             Button(
                 onClick = {
                     onSave(
@@ -140,7 +129,7 @@ fun AccountDetailScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(56.dp),
+                    .height(40.dp),
                 enabled = platformName.isNotBlank() && password.isNotBlank()
             ) {
                 Text("Save")
