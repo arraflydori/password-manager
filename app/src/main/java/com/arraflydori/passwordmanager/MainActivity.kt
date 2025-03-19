@@ -4,7 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,24 +42,35 @@ data class AccountDetail(val id: String)
 @Composable
 fun App() {
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = AccountList) {
-        composable<AccountList> {
-            AccountListScreen(
-                accounts = sampleAccounts,
-                onAccountClick = { account ->
-                    navController.navigate(AccountDetail(account.id))
-                }
-            )
+    val focusManager = LocalFocusManager.current
+
+    Box(
+        modifier = Modifier.clickable(
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        ) {
+            focusManager.clearFocus()
         }
-        composable<AccountDetail> {
-            val route = it.toRoute<AccountDetail>()
-            AccountDetailScreen(
-                account = sampleAccounts.first { it.id == route.id },
-                onSave = {},
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-            )
+    ) {
+        NavHost(navController = navController, startDestination = AccountList) {
+            composable<AccountList> {
+                AccountListScreen(
+                    accounts = sampleAccounts,
+                    onAccountClick = { account ->
+                        navController.navigate(AccountDetail(account.id))
+                    }
+                )
+            }
+            composable<AccountDetail> {
+                val route = it.toRoute<AccountDetail>()
+                AccountDetailScreen(
+                    account = sampleAccounts.first { it.id == route.id },
+                    onSave = {},
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    },
+                )
+            }
         }
     }
 }
