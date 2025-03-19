@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
 object AccountList
 
 @Serializable
-data class AccountDetail(val id: String)
+data class AccountDetail(val id: String?)
 
 @Composable
 fun App() {
@@ -58,13 +58,16 @@ fun App() {
                     accounts = sampleAccounts,
                     onAccountClick = { account ->
                         navController.navigate(AccountDetail(account.id))
+                    },
+                    onNewAccount = {
+                        navController.navigate(AccountDetail(null))
                     }
                 )
             }
             composable<AccountDetail> {
                 val route = it.toRoute<AccountDetail>()
                 AccountDetailScreen(
-                    account = sampleAccounts.first { it.id == route.id },
+                    account = sampleAccounts.firstOrNull { it.id == route.id },
                     onSave = {
                         // TODO: Implement save account
                     },

@@ -44,7 +44,8 @@ import com.arraflydori.passwordmanager.ui.composable.MyTextField
 @Composable
 fun AccountListScreen(
     accounts: List<Account>,
-    onAccountClick: (Account) -> Unit = {}
+    onAccountClick: (Account) -> Unit = {},
+    onNewAccount: () -> Unit = {}
 ) {
     var search by remember { mutableStateOf("") }
 
@@ -74,10 +75,9 @@ fun AccountListScreen(
             FloatingActionButton(
                 shape = CircleShape,
                 elevation = FloatingActionButtonDefaults.loweredElevation(),
-                containerColor = Color.LightGray,
-                onClick = {
-                    // TODO: Create Account
-                },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
+                onClick = onNewAccount,
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add account")
             }

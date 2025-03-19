@@ -38,14 +38,14 @@ import com.arraflydori.passwordmanager.ui.composable.MyTextField
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountDetailScreen(
-    account: Account,
+    account: Account?,
     onSave: (Account) -> Unit,
     onBack: () -> Unit,
 ) {
-    var platformName by remember { mutableStateOf(account.platformName) }
-    var username by remember { mutableStateOf(account.username ?: "") }
-    var email by remember { mutableStateOf(account.email ?: "") }
-    var password by remember { mutableStateOf(account.password) }
+    var platformName by remember { mutableStateOf(account?.platformName ?: "") }
+    var username by remember { mutableStateOf(account?.username ?: "") }
+    var email by remember { mutableStateOf(account?.email ?: "") }
+    var password by remember { mutableStateOf(account?.password ?: "") }
     var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -119,7 +119,7 @@ fun AccountDetailScreen(
                 onClick = {
                     onSave(
                         Account(
-                            id = account.id,
+                            id = account?.id ?: "",
                             platformName = platformName,
                             username = username.ifEmpty { null },
                             email = email.ifEmpty { null },
