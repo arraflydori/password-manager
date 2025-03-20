@@ -13,14 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.arraflydori.passwordmanager.model.Account
+import com.arraflydori.passwordmanager.model.AccountRepository
+import com.arraflydori.passwordmanager.model.FakeAccountRepository
 import com.arraflydori.passwordmanager.ui.screen.AccountDetailScreen
 import com.arraflydori.passwordmanager.ui.screen.AccountListScreen
 import com.arraflydori.passwordmanager.ui.theme.PasswordManagerTheme
+import com.arraflydori.passwordmanager.viewmodel.AccountDetailViewModel
+import com.arraflydori.passwordmanager.viewmodel.AccountListViewModel
 import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
@@ -29,7 +33,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PasswordManagerTheme {
-                App()
+                App(accountRepository = FakeAccountRepository())
             }
         }
     }
@@ -42,7 +46,7 @@ object AccountList
 data class AccountDetail(val id: String?)
 
 @Composable
-fun App() {
+fun App(accountRepository: AccountRepository) {
     val navController = rememberNavController()
     val focusManager = LocalFocusManager.current
 
@@ -56,8 +60,9 @@ fun App() {
     ) {
         NavHost(navController = navController, startDestination = AccountList) {
             composable<AccountList> {
+                val viewModel = viewModel { AccountListViewModel(accountRepository) }
                 AccountListScreen(
-                    accounts = sampleAccounts,
+                    viewModel,
                     onAccountClick = { account ->
                         navController.navigate(AccountDetail(account.id))
                     },
@@ -93,10 +98,11 @@ fun App() {
                 }
             ) {
                 val route = it.toRoute<AccountDetail>()
+                val viewModel = viewModel { AccountDetailViewModel(accountRepository, route.id) }
                 AccountDetailScreen(
-                    account = sampleAccounts.firstOrNull { it.id == route.id },
-                    onSave = {
-                        // TODO: Implement save account
+                    viewModel = viewModel,
+                    onSaveSuccess = {
+                        navController.popBackStack()
                     },
                     onBack = {
                         navController.popBackStack()
@@ -106,27 +112,3 @@ fun App() {
         }
     }
 }
-
-val sampleAccounts = listOf(
-    Account(
-        id = "1",
-        platformName = "Twitter",
-        username = "johndoe",
-        email = "john@example.com",
-        password = "securepass"
-    ),
-    Account(
-        id = "2",
-        platformName = "Facebook",
-        username = "janedoe",
-        email = "jane@example.com",
-        password = "secret123"
-    ),
-    Account(
-        id = "3",
-        platformName = "Instagram",
-        username = null,
-        email = "contact@company.com",
-        password = "pass123"
-    )
-)
