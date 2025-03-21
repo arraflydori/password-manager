@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -81,16 +83,26 @@ fun AccountListScreen(
             }
         }
     ) { contentPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        ) {
-            items(uiState.accounts) { account ->
-                AccountItem(
-                    account = account,
-                    onClick = { onAccountClick(account) }
-                )
+        if (uiState.accounts.isEmpty()) {
+            Text(
+                "No accounts yet.",
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .wrapContentSize()
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(contentPadding),
+            ) {
+                items(uiState.accounts) { account ->
+                    AccountItem(
+                        account = account,
+                        onClick = { onAccountClick(account) }
+                    )
+                }
             }
         }
     }
