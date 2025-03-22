@@ -1,6 +1,7 @@
 package com.arraflydori.passwordmanager.ui.screen
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -20,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
@@ -159,6 +162,19 @@ fun AccountDetailScreen(
                     },
                     hint = "Email",
                     singleLine = true,
+                    trailing = {
+                        if (error.invalidEmail) {
+                            Icon(
+                                Icons.Default.PriorityHigh,
+                                contentDescription = "Invalid email",
+                                tint = MaterialTheme.colorScheme.onError,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .background(color = MaterialTheme.colorScheme.error, shape = CircleShape)
+                                    .padding(4.dp)
+                            )
+                        }
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
@@ -242,7 +258,7 @@ fun AccountDetailScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(40.dp),
-                    enabled = account.platformName.isNotBlank() && account.password.isNotBlank()
+                    enabled = canSave
                 ) {
                     Text("Save")
                 }

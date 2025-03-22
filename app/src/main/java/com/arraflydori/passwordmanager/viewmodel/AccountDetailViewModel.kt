@@ -1,5 +1,6 @@
 package com.arraflydori.passwordmanager.viewmodel
 
+import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import com.arraflydori.passwordmanager.model.Account
 import com.arraflydori.passwordmanager.model.AccountRepository
@@ -13,7 +14,14 @@ data class AccountDetailUiState(
     val showPassword: Boolean = false,
     val showTagOptions: Boolean = false,
     val saveSuccess: Boolean? = null,
-)
+    val error: Error = Error()
+) {
+    data class Error(val invalidEmail: Boolean = false)
+
+    val canSave: Boolean = account.platformName.isNotBlank()
+            && account.password.isNotBlank()
+            && !error.invalidEmail
+}
 
 class AccountDetailViewModel(
     val accountRepository: AccountRepository,
@@ -50,6 +58,11 @@ class AccountDetailViewModel(
                     username = username ?: it.account.username,
                     email = email ?: it.account.email,
                     password = password ?: it.account.password,
+                ),
+                error = it.error.copy(
+                    invalidEmail = (email ?: it.account.email)?.let {
+                        if (it.isEmpty()) false else !Patterns.EMAIL_ADDRESS.matcher(it).matches()
+                    } == true
                 )
             )
         }

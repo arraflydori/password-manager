@@ -44,7 +44,7 @@ fun MyTextField(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .background(
-                        color = Color.LightGray.copy(alpha = 0.5f),
+                        color = Color.LightGray.copy(alpha = 0.25f),
                         shape = RoundedCornerShape(percent = 40)
                     )
                     .padding(16.dp)
