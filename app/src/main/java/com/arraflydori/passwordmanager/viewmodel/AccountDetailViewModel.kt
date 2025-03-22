@@ -9,7 +9,9 @@ import kotlinx.coroutines.flow.update
 
 data class AccountDetailUiState(
     val account: Account = Account(),
+    val tagOptions: Set<String> = setOf(),
     val showPassword: Boolean = false,
+    val showTagOptions: Boolean = false,
     val saveSuccess: Boolean? = null,
 )
 
@@ -21,12 +23,16 @@ class AccountDetailViewModel(
     val uiState = _uiState.asStateFlow()
 
     init {
-        accountId?.let {
-            _uiState.update {
-                it.copy(
-                    account = accountRepository.getAccount(accountId) ?: Account(id = accountId)
-                )
-            }
+        _uiState.update {
+            val tagOptions = accountRepository.getAllTags()
+            it.copy(
+                account = accountId?.let { accountRepository.getAccount(it) }
+                    ?: Account(
+                        id = "",
+                        tags = tagOptions.firstOrNull()?.let { setOf(it) } ?: setOf()
+                    ),
+                tagOptions = tagOptions
+            )
         }
     }
 
@@ -38,12 +44,36 @@ class AccountDetailViewModel(
     ) {
         _uiState.update {
             it.copy(
-                account = Account(
+                account = it.account.copy(
                     id = it.account.id,
                     platformName = platformName ?: it.account.platformName,
                     username = username ?: it.account.username,
                     email = email ?: it.account.email,
-                    password = password ?: it.account.password
+                    password = password ?: it.account.password,
+                )
+            )
+        }
+    }
+
+    fun addTag(tag: String) {
+        _uiState.update {
+            it.copy(
+                account = it.account.copy(
+                    tags = it.account.tags.toMutableSet().apply {
+                        add(tag)
+                    }
+                )
+            )
+        }
+    }
+
+    fun removeTag(tag: String) {
+        _uiState.update {
+            it.copy(
+                account = it.account.copy(
+                    tags = it.account.tags.toMutableSet().apply {
+                        remove(tag)
+                    }
                 )
             )
         }
@@ -52,6 +82,12 @@ class AccountDetailViewModel(
     fun togglePasswordVisibility() {
         _uiState.update {
             it.copy(showPassword = !it.showPassword)
+        }
+    }
+
+    fun toggleTagOptionsVisibility() {
+        _uiState.update {
+            it.copy(showTagOptions = !it.showTagOptions)
         }
     }
 

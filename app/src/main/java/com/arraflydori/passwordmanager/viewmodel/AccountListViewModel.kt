@@ -17,9 +17,9 @@ class AccountListViewModel(val accountRepository: AccountRepository) : ViewModel
     private val _uiState = MutableStateFlow(AccountListUiState())
     val uiState = _uiState.asStateFlow()
 
-    init {
+    fun loadAccounts() {
         _uiState.update {
-            it.copy(accounts =accountRepository.getAllAccounts())
+            it.copy(accounts = accountRepository.getAllAccounts())
         }
     }
 

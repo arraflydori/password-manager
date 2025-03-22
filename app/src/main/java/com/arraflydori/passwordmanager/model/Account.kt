@@ -9,4 +9,5 @@ data class Account(
     val username: String? = null,
     val email: String? = null,
     val password: String = "",
+    val tags: Set<String> = setOf(),
 )
