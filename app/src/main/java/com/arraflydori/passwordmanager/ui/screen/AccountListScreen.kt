@@ -3,27 +3,33 @@ package com.arraflydori.passwordmanager.ui.screen
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -56,24 +62,61 @@ fun AccountListScreen(
 
     Scaffold(
         topBar = {
-            MyTextField(
-                value = uiState.search,
-                onValueChange = {
-                    viewModel.search(it)
-                },
-                hint = "Search",
-                trailing = {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = "Search account",
-                        modifier = Modifier.size(16.dp)
-                    )
-                },
-                modifier = Modifier
-                    .statusBarsPadding()
-                    .padding(16.dp)
-                    .fillMaxWidth()
-            )
+            Column {
+                MyTextField(
+                    value = uiState.search,
+                    onValueChange = {
+                        viewModel.search(it)
+                    },
+                    hint = "Search account",
+                    trailing = {
+                        if (uiState.search.isEmpty()) {
+                            Icon(
+                                Icons.Default.Search,
+                                contentDescription = "Search account",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        } else {
+                            IconButton(
+                                onClick = {
+                                    viewModel.search("")
+                                },
+                                modifier = Modifier.size(20.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Close,
+                                    contentDescription = "Search account",
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .statusBarsPadding()
+                        .padding(16.dp, 16.dp, 16.dp, 8.dp)
+                        .fillMaxWidth()
+                )
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                ) {
+                    val tags = uiState.tags.toList()
+                    items(tags.size) { i ->
+                        val tag = tags[i]
+                        if (i > 0) Spacer(modifier = Modifier.width(4.dp))
+                        FilterChip(
+                            selected = uiState.selectedTags.contains(tag),
+                            onClick = {
+                                viewModel.toggleTagSelection(tag)
+                            },
+                            label = {
+                                Text(tag)
+                            }
+                        )
+                        if (i < uiState.tags.size - 1) Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
         },
         floatingActionButton = {
             FloatingActionButton(
@@ -87,9 +130,9 @@ fun AccountListScreen(
             }
         }
     ) { contentPadding ->
-        if (uiState.accounts.isEmpty()) {
+        if (uiState.filteredAccounts.isEmpty()) {
             Text(
-                "No accounts yet.",
+                if (uiState.accounts.isEmpty()) "No accounts yet." else "No accounts found.",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .fillMaxSize()
@@ -101,7 +144,7 @@ fun AccountListScreen(
                     .fillMaxSize()
                     .padding(contentPadding),
             ) {
-                items(uiState.accounts) { account ->
+                items(uiState.filteredAccounts) { account ->
                     AccountItem(
                         account = account,
                         onClick = { onAccountClick(account) }
