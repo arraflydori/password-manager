@@ -24,6 +24,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FloatingActionButton
@@ -37,6 +39,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -161,11 +166,13 @@ fun AccountItem(
     account: Account,
     onClick: () -> Unit
 ) {
+    var showPassword by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .clickable { onClick() }
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -185,17 +192,38 @@ fun AccountItem(
         ) {
             Text(
                 text = account.platformName,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold
             )
             if (account.username != null || account.email != null) {
                 Text(
                     text = combine(account.username, account.email, " \u2022 "),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = Color.DarkGray
+                    ),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             }
+            Text(
+                if (showPassword) account.password else "****",
+                style = MaterialTheme.typography.labelMedium.copy(
+                    color = Color.DarkGray
+                ),
+                maxLines = 1,
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        IconButton(
+            onClick = {
+                showPassword = !showPassword
+            },
+            modifier = Modifier.size(16.dp)
+        ) {
+            Icon(
+                imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                contentDescription = if (showPassword) "Hide password" else "Show password"
+            )
         }
     }
 }
