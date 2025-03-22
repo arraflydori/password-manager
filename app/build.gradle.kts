@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.arraflydori.passwordmanager"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.arraflydori.passwordmanager"
