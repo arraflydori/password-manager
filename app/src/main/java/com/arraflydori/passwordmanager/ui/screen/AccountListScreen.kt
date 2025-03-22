@@ -1,5 +1,8 @@
 package com.arraflydori.passwordmanager.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -17,6 +20,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -60,6 +64,7 @@ fun AccountListScreen(
     onNewAccount: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val lazyListState = rememberLazyListState()
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
@@ -124,14 +129,21 @@ fun AccountListScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.loweredElevation(),
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
-                onClick = onNewAccount,
+            AnimatedVisibility(
+                visible = lazyListState.canScrollForward
+                        || (!lazyListState.canScrollBackward && !lazyListState.canScrollForward),
+                enter = fadeIn(),
+                exit = fadeOut()
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Add account")
+                FloatingActionButton(
+                    shape = CircleShape,
+                    elevation = FloatingActionButtonDefaults.loweredElevation(),
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                    onClick = onNewAccount,
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Add account")
+                }
             }
         }
     ) { contentPadding ->
@@ -145,6 +157,7 @@ fun AccountListScreen(
             )
         } else {
             LazyColumn(
+                state = lazyListState,
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(contentPadding),
