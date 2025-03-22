@@ -189,46 +189,49 @@ fun AccountDetailScreen(
                         }
                     }
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Tags", style = MaterialTheme.typography.titleSmall)
-                FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    val canRemove = uiState.account.tags.size > 1
-                    for (tag in uiState.account.tags) {
-                        FilterChip(
-                            selected = true,
-                            onClick = {
-                                if (canRemove) viewModel.removeTag(tag)
-                            },
-                            trailingIcon = if (canRemove) {
-                                {
-                                    Icon(
-                                        Icons.Default.Close,
-                                        contentDescription = "Remove tag",
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                }
-                            } else null,
-                            label = {
-                                Text(tag)
-                            }
-                        )
-                    }
-                    if (!availableTags.isEmpty()) FilledTonalIconButton(
-                        onClick = {
-                            viewModel.toggleTagOptionsVisibility()
-                        },
-                        shape = RoundedCornerShape(percent = 24),
-                        modifier = Modifier
-                            .size(32.dp)
-                            .align(Alignment.CenterVertically)
+                Column {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Tags", style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    FlowRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        Icon(
-                            Icons.Default.Add,
-                            contentDescription = "Add tag",
-                            modifier = Modifier.size(16.dp)
-                        )
+                        val canRemove = uiState.account.tags.size > 1
+                        for (tag in uiState.account.tags) {
+                            FilterChip(
+                                selected = true,
+                                onClick = {
+                                    if (canRemove) viewModel.removeTag(tag)
+                                },
+                                trailingIcon = if (canRemove) {
+                                    {
+                                        Icon(
+                                            Icons.Default.Close,
+                                            contentDescription = "Remove tag",
+                                            modifier = Modifier.size(16.dp)
+                                        )
+                                    }
+                                } else null,
+                                label = {
+                                    Text(tag)
+                                }
+                            )
+                        }
+                        if (!availableTags.isEmpty()) FilledTonalIconButton(
+                            onClick = {
+                                viewModel.toggleTagOptionsVisibility()
+                            },
+                            shape = RoundedCornerShape(percent = 24),
+                            modifier = Modifier
+                                .size(32.dp)
+                                .align(Alignment.CenterVertically)
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = "Add tag",
+                                modifier = Modifier.size(16.dp)
+                            )
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
