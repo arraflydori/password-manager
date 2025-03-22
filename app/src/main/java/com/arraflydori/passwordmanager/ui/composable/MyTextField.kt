@@ -37,6 +37,7 @@ fun MyTextField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         visualTransformation = visualTransformation,
+        textStyle = MaterialTheme.typography.bodyMedium,
         modifier = modifier,
         decorationBox = { innerTextField ->
             Row(
