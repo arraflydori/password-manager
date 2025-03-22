@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -138,6 +139,7 @@ fun AccountDetailScreen(
                         viewModel.update(platformName = it)
                     },
                     hint = "Platform",
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 MyTextField(
@@ -146,8 +148,9 @@ fun AccountDetailScreen(
                         viewModel.update(username = it)
                     },
                     hint = "Username",
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true
                 )
                 MyTextField(
                     value = account.email ?: "",
@@ -155,9 +158,12 @@ fun AccountDetailScreen(
                         viewModel.update(email = it)
                     },
                     hint = "Email",
-                    modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Email,
+                        imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 MyTextField(
                     value = account.password,
