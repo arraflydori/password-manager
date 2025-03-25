@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -110,7 +111,7 @@ fun AccountListScreen(
                                     ) {
                                         Icon(
                                             Icons.Default.Close,
-                                            contentDescription = "Search account",
+                                            contentDescription = "Clear account search",
                                             modifier = Modifier.size(16.dp)
                                         )
                                     }
@@ -239,13 +240,15 @@ fun AccountItem(
                     overflow = TextOverflow.Ellipsis
                 )
             }
-            Text(
-                if (showPassword) account.password else "****",
-                style = MaterialTheme.typography.labelMedium.copy(
-                    color = Color.DarkGray
-                ),
-                maxLines = 1,
-            )
+            for (cred in account.credentials) {
+                Text(
+                    if (showPassword) cred.value else "****",
+                    style = MaterialTheme.typography.labelMedium.copy(
+                        color = Color.DarkGray
+                    ),
+                    maxLines = 1,
+                )
+            }
         }
         Spacer(modifier = Modifier.width(16.dp))
         IconButton(

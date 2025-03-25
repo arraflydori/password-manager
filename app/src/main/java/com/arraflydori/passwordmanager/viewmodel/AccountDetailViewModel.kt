@@ -4,6 +4,8 @@ import android.util.Patterns
 import androidx.lifecycle.ViewModel
 import com.arraflydori.passwordmanager.model.Account
 import com.arraflydori.passwordmanager.model.AccountRepository
+import com.arraflydori.passwordmanager.model.Credential
+import com.arraflydori.passwordmanager.model.CredentialType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +13,6 @@ import kotlinx.coroutines.flow.update
 data class AccountDetailUiState(
     val account: Account = Account(),
     val tagOptions: Set<String> = setOf(),
-    val showPassword: Boolean = false,
     val showTagOptions: Boolean = false,
     val saveSuccess: Boolean? = null,
     val error: Error = Error()
@@ -19,7 +20,7 @@ data class AccountDetailUiState(
     data class Error(val invalidEmail: Boolean = false)
 
     val canSave: Boolean = account.platformName.isNotBlank()
-            && account.password.isNotBlank()
+            && account.credentials.all { it.value.isNotBlank() }
             && !error.invalidEmail
 }
 
@@ -29,6 +30,7 @@ class AccountDetailViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountDetailUiState())
     val uiState = _uiState.asStateFlow()
+    private var tempCredId = 0
 
     init {
         _uiState.update {
@@ -48,7 +50,6 @@ class AccountDetailViewModel(
         platformName: String? = null,
         username: String? = null,
         email: String? = null,
-        password: String? = null,
     ) {
         _uiState.update {
             it.copy(
@@ -57,7 +58,6 @@ class AccountDetailViewModel(
                     platformName = platformName ?: it.account.platformName,
                     username = username ?: it.account.username,
                     email = email ?: it.account.email,
-                    password = password ?: it.account.password,
                 ),
                 error = it.error.copy(
                     invalidEmail = (email ?: it.account.email)?.let {
@@ -92,9 +92,49 @@ class AccountDetailViewModel(
         }
     }
 
-    fun togglePasswordVisibility() {
+    fun createCredential() {
         _uiState.update {
-            it.copy(showPassword = !it.showPassword)
+            it.copy(
+                account = it.account.copy(
+                    credentials = it.account.credentials.toMutableList().apply {
+                        add(Credential(
+                            id = tempCredId++.toString(),
+                            type = CredentialType.Password,
+                            value = ""
+                        ))
+                    }
+                )
+            )
+        }
+    }
+
+    fun updateCredential(id: String, value: String? = null, type: CredentialType? = null) {
+        _uiState.update {
+            it.copy(
+                account = it.account.copy(
+                    credentials = it.account.credentials.toMutableList().apply {
+                        val index = indexOfFirst { it.id == id }
+                        if (index != -1) {
+                            this[index] = this[index].copy(
+                                value = value ?: this[index].value,
+                                type = type ?: this[index].type
+                            )
+                        }
+                    }
+                )
+            )
+        }
+    }
+
+    fun removeCredential(credential: Credential) {
+        _uiState.update {
+            it.copy(
+                account = it.account.copy(
+                    credentials = it.account.credentials.toMutableList().apply {
+                        remove(credential)
+                    }
+                )
+            )
         }
     }
 
