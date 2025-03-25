@@ -174,7 +174,6 @@ fun AccountDetailScreen(
                         viewModel.update(username = it)
                     },
                     hint = "Username",
-                    singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -184,7 +183,6 @@ fun AccountDetailScreen(
                         viewModel.update(email = it)
                     },
                     hint = "Email",
-                    singleLine = true,
                     trailing = {
                         if (error.invalidEmail) {
                             Icon(
@@ -204,6 +202,18 @@ fun AccountDetailScreen(
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Email,
                         imeAction = ImeAction.Next
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                MyTextField(
+                    value = account.note,
+                    onValueChange = {
+                        viewModel.update(note = it)
+                    },
+                    hint = "Note",
+                    singleLine = false,
+                    keyboardOptions = KeyboardOptions(
+                        imeAction = if (account.credentials.isEmpty()) ImeAction.Done else ImeAction.Next
                     ),
                     modifier = Modifier.fillMaxWidth(),
                 )
@@ -243,7 +253,10 @@ fun AccountDetailScreen(
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
                                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Password,
+                                    imeAction = if (i != account.credentials.size - 1) ImeAction.Done else ImeAction.Next
+                                ),
                                 trailing = {
                                     if (cred.value.isBlank()) {
                                         Icon(

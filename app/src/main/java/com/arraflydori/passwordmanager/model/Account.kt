@@ -8,6 +8,7 @@ data class Account(
     val platformName: String = "",
     val username: String? = null,
     val email: String? = null,
+    val note: String = "",
     val credentials: List<Credential> = listOf(),
     val tags: Set<String> = setOf(),
 )

@@ -50,6 +50,7 @@ class AccountDetailViewModel(
         platformName: String? = null,
         username: String? = null,
         email: String? = null,
+        note: String? = null,
     ) {
         _uiState.update {
             it.copy(
@@ -58,6 +59,7 @@ class AccountDetailViewModel(
                     platformName = platformName ?: it.account.platformName,
                     username = username ?: it.account.username,
                     email = email ?: it.account.email,
+                    note = note ?: it.account.note,
                 ),
                 error = it.error.copy(
                     invalidEmail = (email ?: it.account.email)?.let {
