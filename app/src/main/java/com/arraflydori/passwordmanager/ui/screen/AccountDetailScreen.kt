@@ -147,6 +147,22 @@ fun AccountDetailScreen(
                     hint = "Platform",
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     modifier = Modifier.fillMaxWidth(),
+                    trailing = {
+                        if (account.platformName.isBlank()) {
+                            Icon(
+                                Icons.Default.PriorityHigh,
+                                contentDescription = "Empty credential",
+                                tint = MaterialTheme.colorScheme.onError,
+                                modifier = Modifier
+                                    .size(20.dp)
+                                    .background(
+                                        color = MaterialTheme.colorScheme.error,
+                                        shape = CircleShape
+                                    )
+                                    .padding(4.dp)
+                            )
+                        }
+                    }
                 )
                 MyTextField(
                     value = account.username ?: "",
@@ -224,16 +240,31 @@ fun AccountDetailScreen(
                                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                                 trailing = {
-                                    IconButton(
-                                        onClick = {
-                                            showPassword = !showPassword
-                                        },
-                                        modifier = Modifier.size(16.dp)
-                                    ) {
+                                    if (cred.value.isBlank()) {
                                         Icon(
-                                            imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
-                                            contentDescription = if (showPassword) "Hide password" else "Show password"
+                                            Icons.Default.PriorityHigh,
+                                            contentDescription = "Empty credential",
+                                            tint = MaterialTheme.colorScheme.onError,
+                                            modifier = Modifier
+                                                .size(20.dp)
+                                                .background(
+                                                    color = MaterialTheme.colorScheme.error,
+                                                    shape = CircleShape
+                                                )
+                                                .padding(4.dp)
                                         )
+                                    } else {
+                                        IconButton(
+                                            onClick = {
+                                                showPassword = !showPassword
+                                            },
+                                            modifier = Modifier.size(16.dp)
+                                        ) {
+                                            Icon(
+                                                imageVector = if (showPassword) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                                                contentDescription = if (showPassword) "Hide password" else "Show password"
+                                            )
+                                        }
                                     }
                                 }
                             )
@@ -251,7 +282,7 @@ fun AccountDetailScreen(
                                 )
                             }
                         }
-                        if (i != account.credentials.size-1) Spacer(modifier = Modifier.height(16.dp))
+                        if (i != account.credentials.size - 1) Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
                 Column {
