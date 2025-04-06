@@ -1,32 +1,25 @@
 package com.arraflydori.passwordmanager.model
 
 class FakeAccountRepository : AccountRepository {
-    private val accounts = mutableListOf<Account>()
-    private val tags = mutableSetOf<String>()
+    private val accountMap = mutableMapOf<String, MutableList<Account>>()
     private var idCounter = 0
 
-    init {
-        tags.addAll(listOf(
-            "Service", "Finance", "Education", "Government", "Tech", "Social", "Lifestyle", "Entertainment"
-        ))
+    override fun getAccounts(vaultId: String): List<Account> {
+        return accountMap[vaultId].orEmpty()
     }
 
-    override fun getAllAccounts(): List<Account> {
-        return accounts
+    override fun getAccount(vaultId: String, accountId: String): Account? {
+        return accountMap[vaultId]?.firstOrNull { it.id == accountId }
     }
 
-    override fun getAccount(id: String): Account? {
-        return accounts.firstOrNull { it.id == id }
-    }
+    override fun updateAccount(vaultId: String, account: Account): Boolean {
+        val accounts = accountMap.getOrPut(vaultId) { mutableListOf() }
 
-    override fun updateAccount(account: Account): Boolean {
         return if (account.id.isBlank()) {
-            accounts.add(account.copy(
-                id = (++idCounter).toString()
-            ))
+            accounts.add(account.copy(id = (++idCounter).toString()))
             true
         } else {
-            val index =  accounts.indexOfFirst { it.id == account.id }
+            val index = accounts.indexOfFirst { it.id == account.id }
             if (index == -1) {
                 accounts.add(account)
                 false
@@ -37,19 +30,7 @@ class FakeAccountRepository : AccountRepository {
         }
     }
 
-    override fun deleteAccount(id: String): Boolean {
-        return accounts.removeIf { it.id == id }
-    }
-
-    override fun getAllTags(): Set<String> {
-        return tags
-    }
-
-    override fun createTag(tag: String): Boolean {
-        return tags.add(tag)
-    }
-
-    override fun deleteTag(tag: String): Boolean {
-        return tags.remove(tag)
+    override fun deleteAccount(vaultId: String, accountId: String): Boolean {
+        return accountMap[vaultId]?.removeIf { it.id == accountId } == true
     }
 }

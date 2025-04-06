@@ -6,6 +6,7 @@ import com.arraflydori.passwordmanager.model.Account
 import com.arraflydori.passwordmanager.model.AccountRepository
 import com.arraflydori.passwordmanager.model.Credential
 import com.arraflydori.passwordmanager.model.CredentialType
+import com.arraflydori.passwordmanager.model.TagRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,8 +26,10 @@ data class AccountDetailUiState(
 }
 
 class AccountDetailViewModel(
-    val accountRepository: AccountRepository,
+    val vaultId: String,
     accountId: String?,
+    private val accountRepository: AccountRepository,
+    private val tagRepository: TagRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(AccountDetailUiState())
     val uiState = _uiState.asStateFlow()
@@ -34,9 +37,9 @@ class AccountDetailViewModel(
 
     init {
         _uiState.update {
-            val tagOptions = accountRepository.getAllTags()
+            val tagOptions = tagRepository.getTags(vaultId)
             it.copy(
-                account = accountId?.let { accountRepository.getAccount(it) }
+                account = accountId?.let { accountRepository.getAccount(vaultId, it) }
                     ?: Account(
                         id = "",
                         tags = tagOptions.firstOrNull()?.let { setOf(it) } ?: setOf()
@@ -99,11 +102,14 @@ class AccountDetailViewModel(
             it.copy(
                 account = it.account.copy(
                     credentials = it.account.credentials.toMutableList().apply {
-                        add(Credential(
-                            id = tempCredId++.toString(),
-                            type = CredentialType.Password,
-                            value = ""
-                        ))
+                        // TODO: Fix this Credential Id
+                        add(
+                            Credential(
+                                id = tempCredId++.toString(),
+                                type = CredentialType.Password,
+                                value = ""
+                            )
+                        )
                     }
                 )
             )
@@ -147,7 +153,7 @@ class AccountDetailViewModel(
     }
 
     fun save() {
-        accountRepository.updateAccount(_uiState.value.account)
+        accountRepository.updateAccount(vaultId, _uiState.value.account)
         _uiState.update {
             it.copy(saveSuccess = true)
         }

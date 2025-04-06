@@ -21,6 +21,10 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.arraflydori.passwordmanager.model.AccountRepository
 import com.arraflydori.passwordmanager.model.FakeAccountRepository
+import com.arraflydori.passwordmanager.model.FakeTagRepository
+import com.arraflydori.passwordmanager.model.FakeVaultRepository
+import com.arraflydori.passwordmanager.model.TagRepository
+import com.arraflydori.passwordmanager.model.VaultRepository
 import com.arraflydori.passwordmanager.ui.screen.AccountDetailScreen
 import com.arraflydori.passwordmanager.ui.screen.AccountListScreen
 import com.arraflydori.passwordmanager.ui.screen.VaultListScreen
@@ -34,14 +38,22 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             PasswordManagerTheme {
-                App(accountRepository = FakeAccountRepository())
+                App(
+                    vaultRepository = FakeVaultRepository(),
+                    accountRepository = FakeAccountRepository(),
+                    tagRepository = FakeTagRepository(),
+                )
             }
         }
     }
 }
 
 @Composable
-fun App(accountRepository: AccountRepository) {
+fun App(
+    vaultRepository: VaultRepository,
+    accountRepository: AccountRepository,
+    tagRepository: TagRepository,
+) {
     val navController = rememberNavController()
     val focusManager = LocalFocusManager.current
 
@@ -55,14 +67,31 @@ fun App(accountRepository: AccountRepository) {
     ) {
         NavHost(navController = navController, startDestination = VaultListRoute) {
             composable<AccountListRoute> {
-                val viewModel = viewModel { AccountListViewModel(accountRepository) }
+                val route = it.toRoute<AccountListRoute>()
+                val viewModel = viewModel {
+                    AccountListViewModel(
+                        vaultId = route.vaultId,
+                        accountRepository = accountRepository,
+                        tagRepository = tagRepository
+                    )
+                }
                 AccountListScreen(
                     viewModel,
                     onAccountClick = { account ->
-                        navController.navigate(AccountDetailRoute(account.id))
+                        navController.navigate(
+                            AccountDetailRoute(
+                                vaultId = route.vaultId,
+                                accountId = account.id
+                            )
+                        )
                     },
                     onNewAccount = {
-                        navController.navigate(AccountDetailRoute(null))
+                        navController.navigate(
+                            AccountDetailRoute(
+                                vaultId = route.vaultId,
+                                accountId = null
+                            )
+                        )
                     }
                 )
             }
@@ -93,7 +122,14 @@ fun App(accountRepository: AccountRepository) {
                 }
             ) {
                 val route = it.toRoute<AccountDetailRoute>()
-                val viewModel = viewModel { AccountDetailViewModel(accountRepository, route.id) }
+                val viewModel = viewModel {
+                    AccountDetailViewModel(
+                        vaultId = route.vaultId,
+                        accountId = route.accountId,
+                        accountRepository = accountRepository,
+                        tagRepository = tagRepository
+                    )
+                }
                 AccountDetailScreen(
                     viewModel = viewModel,
                     onSaveSuccess = {
@@ -105,9 +141,10 @@ fun App(accountRepository: AccountRepository) {
                 )
             }
             composable<VaultListRoute> {
+                // TODO: Provide ViewModel
                 VaultListScreen(
-                    onVaultClick = {
-                        navController.navigate(AccountListRoute)
+                    onVaultClick = { vaultId ->
+                        navController.navigate(AccountListRoute(vaultId))
                     }
                 )
             }

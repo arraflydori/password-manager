@@ -1,11 +1,8 @@
 package com.arraflydori.passwordmanager.model
 
 interface AccountRepository {
-    fun getAllAccounts(): List<Account>
-    fun getAccount(id: String): Account?
-    fun updateAccount(account: Account): Boolean
-    fun deleteAccount(id: String): Boolean
-    fun getAllTags(): Set<String>
-    fun createTag(tag: String): Boolean
-    fun deleteTag(tag: String): Boolean
+    fun getAccounts(vaultId: String): List<Account>
+    fun getAccount(vaultId: String, accountId: String): Account?
+    fun updateAccount(vaultId: String, account: Account): Boolean
+    fun deleteAccount(vaultId: String, accountId: String): Boolean
 }
