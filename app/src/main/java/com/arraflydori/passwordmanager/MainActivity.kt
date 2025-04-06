@@ -23,10 +23,10 @@ import com.arraflydori.passwordmanager.model.AccountRepository
 import com.arraflydori.passwordmanager.model.FakeAccountRepository
 import com.arraflydori.passwordmanager.ui.screen.AccountDetailScreen
 import com.arraflydori.passwordmanager.ui.screen.AccountListScreen
+import com.arraflydori.passwordmanager.ui.screen.VaultListScreen
 import com.arraflydori.passwordmanager.ui.theme.PasswordManagerTheme
 import com.arraflydori.passwordmanager.viewmodel.AccountDetailViewModel
 import com.arraflydori.passwordmanager.viewmodel.AccountListViewModel
-import kotlinx.serialization.Serializable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,12 +39,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
-
-@Serializable
-object AccountList
-
-@Serializable
-data class AccountDetail(val id: String?)
 
 @Composable
 fun App(accountRepository: AccountRepository) {
@@ -59,20 +53,20 @@ fun App(accountRepository: AccountRepository) {
             focusManager.clearFocus()
         }
     ) {
-        NavHost(navController = navController, startDestination = AccountList) {
-            composable<AccountList> {
+        NavHost(navController = navController, startDestination = VaultListRoute) {
+            composable<AccountListRoute> {
                 val viewModel = viewModel { AccountListViewModel(accountRepository) }
                 AccountListScreen(
                     viewModel,
                     onAccountClick = { account ->
-                        navController.navigate(AccountDetail(account.id))
+                        navController.navigate(AccountDetailRoute(account.id))
                     },
                     onNewAccount = {
-                        navController.navigate(AccountDetail(null))
+                        navController.navigate(AccountDetailRoute(null))
                     }
                 )
             }
-            composable<AccountDetail>(
+            composable<AccountDetailRoute>(
                 enterTransition = {
                     slideIntoContainer(
                         AnimatedContentTransitionScope.SlideDirection.Start,
@@ -98,7 +92,7 @@ fun App(accountRepository: AccountRepository) {
                     )
                 }
             ) {
-                val route = it.toRoute<AccountDetail>()
+                val route = it.toRoute<AccountDetailRoute>()
                 val viewModel = viewModel { AccountDetailViewModel(accountRepository, route.id) }
                 AccountDetailScreen(
                     viewModel = viewModel,
@@ -108,6 +102,13 @@ fun App(accountRepository: AccountRepository) {
                     onBack = {
                         navController.safePopBackStack()
                     },
+                )
+            }
+            composable<VaultListRoute> {
+                VaultListScreen(
+                    onVaultClick = {
+                        navController.navigate(AccountListRoute)
+                    }
                 )
             }
         }
