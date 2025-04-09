@@ -10,3 +10,6 @@ data class AccountDetailRoute(val vaultId: String, val accountId: String?)
 
 @Serializable
 data object VaultListRoute
+
+@Serializable
+data class VaultDetailRoute(val vaultId: String?)

@@ -27,10 +27,13 @@ import com.arraflydori.passwordmanager.model.TagRepository
 import com.arraflydori.passwordmanager.model.VaultRepository
 import com.arraflydori.passwordmanager.ui.screen.AccountDetailScreen
 import com.arraflydori.passwordmanager.ui.screen.AccountListScreen
+import com.arraflydori.passwordmanager.ui.screen.VaultDetailScreen
 import com.arraflydori.passwordmanager.ui.screen.VaultListScreen
 import com.arraflydori.passwordmanager.ui.theme.PasswordManagerTheme
 import com.arraflydori.passwordmanager.viewmodel.AccountDetailViewModel
 import com.arraflydori.passwordmanager.viewmodel.AccountListViewModel
+import com.arraflydori.passwordmanager.viewmodel.VaultDetailViewModel
+import com.arraflydori.passwordmanager.viewmodel.VaultListViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,11 +144,60 @@ fun App(
                 )
             }
             composable<VaultListRoute> {
-                // TODO: Provide ViewModel
+                val viewModel = viewModel {
+                    VaultListViewModel(vaultRepository = vaultRepository)
+                }
                 VaultListScreen(
+                    viewModel = viewModel,
+                    onAddVault = {
+                        navController.navigate(VaultDetailRoute(null))
+                    },
                     onVaultClick = { vaultId ->
                         navController.navigate(AccountListRoute(vaultId))
                     }
+                )
+            }
+            composable<VaultDetailRoute>(
+                enterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Start,
+                        tween(200)
+                    )
+                },
+                exitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.Start,
+                        tween(200)
+                    )
+                },
+                popEnterTransition = {
+                    slideIntoContainer(
+                        AnimatedContentTransitionScope.SlideDirection.End,
+                        tween(200)
+                    )
+                },
+                popExitTransition = {
+                    slideOutOfContainer(
+                        AnimatedContentTransitionScope.SlideDirection.End,
+                        tween(200)
+                    )
+                }
+            ) {
+                val route = it.toRoute<VaultDetailRoute>()
+                val viewModel = viewModel {
+                    VaultDetailViewModel(
+                        vaultId = route.vaultId,
+                        vaultRepository = vaultRepository,
+                    )
+                }
+                VaultDetailScreen(
+                    viewModel = viewModel,
+                    onSaveSuccess = {
+                        navController.safePopBackStack()
+                    },
+                    onBack = {
+                        navController.safePopBackStack()
+                    },
                 )
             }
         }
