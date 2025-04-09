@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
@@ -38,9 +39,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -62,6 +67,9 @@ fun VaultListScreen(
     modifier: Modifier = Modifier,
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val lazyGridState = rememberLazyGridState()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val collapsedFraction = remember { derivedStateOf { scrollBehavior.state.collapsedFraction } }
 
     LaunchedEffect(Unit) {
         viewModel.loadVaults()
@@ -74,15 +82,21 @@ fun VaultListScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface
-                ),
+                ).let {
+                    it.copy(scrolledContainerColor = it.containerColor)
+                },
                 actions = {
                     IconButton(onClick = onVaultAdd) {
                         Icon(Icons.Default.Add, contentDescription = "Add vault")
                     }
                     Spacer(modifier = Modifier.width(4.dp))
-                }
+                },
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier
+                    .graphicsLayer { alpha = 1 - collapsedFraction.value }
             )
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
     ) { contentPadding ->
         if (uiState.vaults.isEmpty()) {
             Text(
@@ -95,6 +109,7 @@ fun VaultListScreen(
             )
         } else {
             LazyVerticalGrid(
+                state = lazyGridState,
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
