@@ -70,6 +70,13 @@ fun VaultListScreen(
     val lazyGridState = rememberLazyGridState()
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val collapsedFraction = remember { derivedStateOf { scrollBehavior.state.collapsedFraction } }
+    val gridCanScroll by remember(lazyGridState, uiState.vaults) {
+        derivedStateOf {
+            val visibleItems = lazyGridState.layoutInfo.visibleItemsInfo.size
+            val totalItems = lazyGridState.layoutInfo.totalItemsCount
+            totalItems > visibleItems
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadVaults()
@@ -91,7 +98,7 @@ fun VaultListScreen(
                     }
                     Spacer(modifier = Modifier.width(4.dp))
                 },
-                scrollBehavior = scrollBehavior,
+                scrollBehavior = if (gridCanScroll) scrollBehavior else null,
                 modifier = Modifier
                     .graphicsLayer { alpha = 1 - collapsedFraction.value }
             )

@@ -72,6 +72,13 @@ fun AccountListScreen(
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val collapsedFraction = remember { derivedStateOf { scrollBehavior.state.collapsedFraction } }
     val focusManager = LocalFocusManager.current
+    val listCanScroll by remember(lazyListState, uiState.accounts) {
+        derivedStateOf {
+            val visibleItems = lazyListState.layoutInfo.visibleItemsInfo.size
+            val totalItems = lazyListState.layoutInfo.totalItemsCount
+            totalItems > visibleItems
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.loadAccounts()
@@ -125,7 +132,7 @@ fun AccountListScreen(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors().let {
                         it.copy(scrolledContainerColor = it.containerColor)
                     },
-                    scrollBehavior = scrollBehavior
+                    scrollBehavior = if (listCanScroll) scrollBehavior else null,
                 )
                 LazyRow(
                     contentPadding = PaddingValues(horizontal = 16.dp),
