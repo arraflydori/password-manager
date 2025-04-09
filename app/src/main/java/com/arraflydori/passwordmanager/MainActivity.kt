@@ -149,8 +149,11 @@ fun App(
                 }
                 VaultListScreen(
                     viewModel = viewModel,
-                    onAddVault = {
+                    onVaultAdd = {
                         navController.navigate(VaultDetailRoute(null))
+                    },
+                    onVaultEdit = { vaultId ->
+                        navController.navigate(VaultDetailRoute(vaultId))
                     },
                     onVaultClick = { vaultId ->
                         navController.navigate(AccountListRoute(vaultId))
@@ -193,6 +196,9 @@ fun App(
                 VaultDetailScreen(
                     viewModel = viewModel,
                     onSaveSuccess = {
+                        navController.safePopBackStack()
+                    },
+                    onDeleteSuccess = {
                         navController.safePopBackStack()
                     },
                     onBack = {

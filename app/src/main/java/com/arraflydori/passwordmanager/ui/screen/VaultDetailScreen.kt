@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -42,12 +44,17 @@ import com.arraflydori.passwordmanager.viewmodel.VaultDetailViewModel
 fun VaultDetailScreen(
     viewModel: VaultDetailViewModel,
     onSaveSuccess: () -> Unit,
+    onDeleteSuccess: () -> Unit,
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess == true) onSaveSuccess()
+    }
+
+    LaunchedEffect(uiState.deleteSuccess) {
+        if (uiState.deleteSuccess == true) onDeleteSuccess()
     }
 
     Scaffold(
@@ -64,6 +71,14 @@ fun VaultDetailScreen(
                         )
                     }
                 },
+                actions = {
+                    if (uiState.canDelete) {
+                        IconButton(onClick = { viewModel.delete() }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Add vault")
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -109,7 +124,7 @@ fun VaultDetailScreen(
                         viewModel.update(description = it)
                     },
                     hint = "Description",
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(modifier = Modifier.weight(1f))

@@ -10,7 +10,9 @@ import kotlinx.coroutines.flow.update
 data class VaultDetailUiState(
     val vault: Vault = Vault(),
     val saveSuccess: Boolean? = null,
+    val deleteSuccess: Boolean? = null,
 ) {
+    val canDelete: Boolean = vault.id.isNotEmpty()
     val canSave: Boolean = vault.name.isNotBlank()
 }
 
@@ -39,6 +41,13 @@ class VaultDetailViewModel(
                     description = description ?: it.vault.description,
                 )
             )
+        }
+    }
+
+    fun delete() {
+        vaultRepository.deleteVault(_uiState.value.vault.id)
+        _uiState.update {
+            it.copy(deleteSuccess = true)
         }
     }
 

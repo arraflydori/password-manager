@@ -1,7 +1,8 @@
 package com.arraflydori.passwordmanager.ui.screen
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -51,11 +52,12 @@ import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun VaultListScreen(
     viewModel: VaultListViewModel,
-    onAddVault: () -> Unit,
+    onVaultAdd: () -> Unit,
+    onVaultEdit: (id: String) -> Unit,
     onVaultClick: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -74,7 +76,7 @@ fun VaultListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onSurface
                 ),
                 actions = {
-                    IconButton(onClick = onAddVault) {
+                    IconButton(onClick = onVaultAdd) {
                         Icon(Icons.Default.Add, contentDescription = "Add vault")
                     }
                     Spacer(modifier = Modifier.width(4.dp))
@@ -105,7 +107,10 @@ fun VaultListScreen(
                     uiState.vaults[i].let {
                         VaultCard(
                             vault = it,
-                            modifier = Modifier.clickable { onVaultClick(it.id) }
+                            modifier = Modifier.combinedClickable(
+                                onClick = { onVaultClick(it.id) },
+                                onLongClick = { onVaultEdit(it.id) }
+                            )
                         )
                     }
                 }
@@ -115,13 +120,16 @@ fun VaultListScreen(
 }
 
 @Composable
-fun VaultCard(vault: Vault, modifier: Modifier = Modifier) {
+fun VaultCard(
+    vault: Vault,
+    modifier: Modifier = Modifier
+) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .aspectRatio(1f),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primary),
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
     ) {
         BoxWithConstraints {
             val maxHeight = this.constraints.maxHeight
