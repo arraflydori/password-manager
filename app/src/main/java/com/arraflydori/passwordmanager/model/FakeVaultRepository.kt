@@ -14,7 +14,6 @@ class FakeVaultRepository : VaultRepository {
         return vaults.firstOrNull { it.id == id }
     }
 
-    // TODO: Support batch updates
     override fun updateVault(vault: Vault): Vault? {
         vault.copy(lastUpdate = Clock.System.now()).let {
             return if (it.id.isBlank()) {
