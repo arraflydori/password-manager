@@ -200,7 +200,11 @@ fun App(
                         navController.safePopBackStack()
                     },
                     onDeleteSuccess = {
-                        navController.safePopBackStack()
+                        navController.navigate(VaultListRoute) {
+                            popUpTo(VaultListRoute) {
+                                inclusive = true
+                            }
+                        }
                     },
                     onBack = {
                         navController.safePopBackStack()
