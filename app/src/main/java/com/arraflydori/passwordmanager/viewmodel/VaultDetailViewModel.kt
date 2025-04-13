@@ -16,7 +16,9 @@ data class VaultDetailUiState(
     val deleteSuccess: Boolean? = null,
 ) {
     val canDelete: Boolean = vault.id.isNotEmpty()
-    val canSave: Boolean = vault.name.isNotBlank() && tags.all { it.label.isNotBlank() }
+    val canSave: Boolean = vault.name.isNotBlank()
+            && tags.isNotEmpty()
+            && tags.all { it.label.isNotBlank() }
 }
 
 class VaultDetailViewModel(
@@ -32,9 +34,10 @@ class VaultDetailViewModel(
         _uiState.update {
             it.copy(
                 vault = vaultId?.let { vaultRepository.getVault(vaultId) } ?: Vault(),
-                tags = oldTags ?: listOf(),
+                tags = oldTags ?: listOf()
             )
         }
+        if (_uiState.value.tags.isEmpty()) createTag()
     }
 
     fun update(

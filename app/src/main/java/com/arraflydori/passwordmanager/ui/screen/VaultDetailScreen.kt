@@ -22,7 +22,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material3.Button
@@ -185,6 +184,7 @@ fun VaultDetailScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         IconButton(
+                            enabled = tags.size > 1,
                             onClick = {
                                 viewModel.removeTag(tag)
                             },
