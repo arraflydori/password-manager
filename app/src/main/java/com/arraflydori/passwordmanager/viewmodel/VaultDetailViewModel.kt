@@ -1,6 +1,8 @@
 package com.arraflydori.passwordmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.arraflydori.passwordmanager.model.Tag
+import com.arraflydori.passwordmanager.model.TagRepository
 import com.arraflydori.passwordmanager.model.Vault
 import com.arraflydori.passwordmanager.model.VaultRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,23 +11,29 @@ import kotlinx.coroutines.flow.update
 
 data class VaultDetailUiState(
     val vault: Vault = Vault(),
+    val tags: List<Tag> = listOf(),
     val saveSuccess: Boolean? = null,
     val deleteSuccess: Boolean? = null,
 ) {
     val canDelete: Boolean = vault.id.isNotEmpty()
-    val canSave: Boolean = vault.name.isNotBlank()
+    val canSave: Boolean = vault.name.isNotBlank() && tags.all { it.label.isNotBlank() }
 }
 
 class VaultDetailViewModel(
     vaultId: String?,
     private val vaultRepository: VaultRepository,
+    private val tagRepository: TagRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(VaultDetailUiState())
     val uiState = _uiState.asStateFlow()
+    private var oldTags: List<Tag>? = vaultId?.let { tagRepository.getTags(it) }
 
     init {
         _uiState.update {
-            it.copy(vault = vaultId?.let { vaultRepository.getVault(vaultId) } ?: Vault())
+            it.copy(
+                vault = vaultId?.let { vaultRepository.getVault(vaultId) } ?: Vault(),
+                tags = oldTags ?: listOf(),
+            )
         }
     }
 
@@ -44,7 +52,31 @@ class VaultDetailViewModel(
         }
     }
 
-    fun delete() {
+    fun createTag() {
+        _uiState.update {
+            it.copy(tags = it.tags.toMutableList().apply {
+                add(Tag(id = "", label = ""))
+            })
+        }
+    }
+
+    fun updateTag(index: Int, tagLabel: String) {
+        _uiState.update {
+            it.copy(tags = it.tags.toMutableList().apply {
+                this[index] = this[index].copy(label = tagLabel)
+            })
+        }
+    }
+
+    fun removeTag(tag: Tag) {
+        _uiState.update {
+            it.copy(tags = it.tags.toMutableList().apply {
+                remove(tag)
+            })
+        }
+    }
+
+    fun deleteVault() {
         vaultRepository.deleteVault(_uiState.value.vault.id)
         _uiState.update {
             it.copy(deleteSuccess = true)
@@ -52,9 +84,20 @@ class VaultDetailViewModel(
     }
 
     fun save() {
-        vaultRepository.updateVault(_uiState.value.vault)
         _uiState.update {
-            it.copy(saveSuccess = true)
+            val vault = vaultRepository.updateVault(it.vault)
+            if (vault != null) {
+                oldTags?.let { tags ->
+                    tags.filter { tag -> it.tags.none { it.id == tag.id } }
+                        .forEach { tag -> tagRepository.deleteTag(vault.id, tag) }
+                }
+                it.tags.forEach { tag ->
+                    tagRepository.updateTag(vault.id, tag)
+                }
+                it.copy(saveSuccess = true)
+            } else {
+                it.copy(saveSuccess = false)
+            }
         }
     }
 }

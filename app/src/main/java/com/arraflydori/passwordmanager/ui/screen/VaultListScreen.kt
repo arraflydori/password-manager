@@ -2,7 +2,7 @@ package com.arraflydori.passwordmanager.ui.screen
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -62,7 +62,6 @@ import kotlin.time.Duration.Companion.minutes
 fun VaultListScreen(
     viewModel: VaultListViewModel,
     onVaultAdd: () -> Unit,
-    onVaultEdit: (id: String) -> Unit,
     onVaultClick: (id: String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -129,10 +128,9 @@ fun VaultListScreen(
                     uiState.vaults[i].let {
                         VaultCard(
                             vault = it,
-                            modifier = Modifier.combinedClickable(
-                                onClick = { onVaultClick(it.id) },
-                                onLongClick = { onVaultEdit(it.id) }
-                            )
+                            modifier = Modifier.clickable {
+                                onVaultClick(it.id)
+                            }
                         )
                     }
                 }

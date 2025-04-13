@@ -1,5 +1,6 @@
 package com.arraflydori.passwordmanager.model
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,5 +11,24 @@ data class Account(
     val email: String? = null,
     val note: String = "",
     val credentials: List<Credential> = listOf(),
-    val tags: Set<String> = setOf(),
+    val tags: List<Tag> = listOf(),
+)
+
+@Serializable
+data class Credential(
+    val id: String,
+    val type: CredentialType,
+    val value: String,
+)
+
+@Serializable
+enum class CredentialType {
+    @SerialName("pin") PIN,
+    @SerialName("password") Password
+}
+
+@Serializable
+data class Tag(
+    val id: String,
+    val label: String,
 )

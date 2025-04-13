@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 data class AccountListUiState(
+    val vaultId: String,
     val accounts: List<Account> = listOf(),
     val tags: Set<String> = setOf(),
     val filteredAccounts: List<Account> = listOf(),
@@ -21,14 +22,14 @@ class AccountListViewModel(
     private val accountRepository: AccountRepository,
     private val tagRepository: TagRepository,
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AccountListUiState())
+    private val _uiState = MutableStateFlow(AccountListUiState(vaultId))
     val uiState = _uiState.asStateFlow()
 
     fun loadAccounts() {
         _uiState.update {
             it.copy(
                 accounts = accountRepository.getAccounts(vaultId),
-                tags = tagRepository.getTags(vaultId)
+                tags = tagRepository.getTags(vaultId).map { it.label }.toSet()
             )
         }
         search(_uiState.value.search)
@@ -43,7 +44,7 @@ class AccountListViewModel(
                         it
                     } else {
                         it.filter {
-                            it.tags.any { it in state.selectedTags }
+                            it.tags.any { it.label in state.selectedTags }
                         }
                     }
                 }.filter {

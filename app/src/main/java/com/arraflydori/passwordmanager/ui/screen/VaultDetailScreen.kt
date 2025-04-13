@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,8 +19,11 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ChevronLeft
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteOutline
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,8 +37,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.arraflydori.passwordmanager.ui.composable.MyTextField
 import com.arraflydori.passwordmanager.viewmodel.VaultDetailViewModel
@@ -73,8 +79,8 @@ fun VaultDetailScreen(
                 },
                 actions = {
                     if (uiState.canDelete) {
-                        IconButton(onClick = { viewModel.delete() }) {
-                            Icon(Icons.Default.Delete, contentDescription = "Add vault")
+                        IconButton(onClick = { viewModel.deleteVault() }) {
+                            Icon(Icons.Default.DeleteOutline, contentDescription = "Delete vault")
                         }
                         Spacer(modifier = Modifier.width(4.dp))
                     }
@@ -127,6 +133,71 @@ fun VaultDetailScreen(
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     modifier = Modifier.fillMaxWidth(),
                 )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    Text("Available Tags", style = MaterialTheme.typography.titleSmall)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    IconButton(
+                        onClick = {
+                            viewModel.createTag()
+                        },
+                        modifier = Modifier.size(24.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = "Add tag",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                for ((i, tag) in tags.withIndex()) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        MyTextField(
+                            value = tag.label,
+                            onValueChange = {
+                                viewModel.updateTag(i, it)
+                            },
+                            hint = "Tag",
+                            modifier = Modifier.weight(1f),
+                            singleLine = true,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Password,
+                                imeAction = ImeAction.Next
+                            ),
+                            trailing = {
+                                if (tag.label.isBlank()) {
+                                    Icon(
+                                        Icons.Default.PriorityHigh,
+                                        contentDescription = "Empty tag label",
+                                        tint = MaterialTheme.colorScheme.onError,
+                                        modifier = Modifier
+                                            .size(20.dp)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.error,
+                                                shape = CircleShape
+                                            )
+                                            .padding(4.dp)
+                                    )
+                                }
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        IconButton(
+                            onClick = {
+                                viewModel.removeTag(tag)
+                            },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                Icons.Default.Close,
+                                contentDescription = "Remove tag",
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                }
                 Spacer(modifier = Modifier.weight(1f))
                 Button(
                     onClick = {

@@ -14,19 +14,21 @@ class FakeVaultRepository : VaultRepository {
         return vaults.firstOrNull { it.id == id }
     }
 
-    override fun updateVault(vault: Vault): Boolean {
+    // TODO: Support batch updates
+    override fun updateVault(vault: Vault): Vault? {
         vault.copy(lastUpdate = Clock.System.now()).let {
             return if (it.id.isBlank()) {
-                vaults.add(it.copy(id = (++idCounter).toString()))
-                true
+                val vault = it.copy(id = (++idCounter).toString())
+                vaults.add(vault)
+                vault
             } else {
                 val index = vaults.indexOfFirst { it.id == vault.id }
                 if (index == -1) {
                     vaults.add(it)
-                    false
+                    null
                 } else {
                     vaults[index] = it
-                    true
+                    it
                 }
             }
         }

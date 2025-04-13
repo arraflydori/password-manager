@@ -88,6 +88,9 @@ fun App(
                             )
                         )
                     },
+                    onSettingsClick = { vaultId ->
+                        navController.navigate(VaultDetailRoute(vaultId))
+                    },
                     onNewAccount = {
                         navController.navigate(
                             AccountDetailRoute(
@@ -152,9 +155,6 @@ fun App(
                     onVaultAdd = {
                         navController.navigate(VaultDetailRoute(null))
                     },
-                    onVaultEdit = { vaultId ->
-                        navController.navigate(VaultDetailRoute(vaultId))
-                    },
                     onVaultClick = { vaultId ->
                         navController.navigate(AccountListRoute(vaultId))
                     }
@@ -191,6 +191,7 @@ fun App(
                     VaultDetailViewModel(
                         vaultId = route.vaultId,
                         vaultRepository = vaultRepository,
+                        tagRepository = tagRepository,
                     )
                 }
                 VaultDetailScreen(

@@ -6,6 +6,7 @@ import com.arraflydori.passwordmanager.model.Account
 import com.arraflydori.passwordmanager.model.AccountRepository
 import com.arraflydori.passwordmanager.model.Credential
 import com.arraflydori.passwordmanager.model.CredentialType
+import com.arraflydori.passwordmanager.model.Tag
 import com.arraflydori.passwordmanager.model.TagRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.update
 
 data class AccountDetailUiState(
     val account: Account = Account(),
-    val tagOptions: Set<String> = setOf(),
+    val tagOptions: List<Tag> = listOf(),
     val showTagOptions: Boolean = false,
     val saveSuccess: Boolean? = null,
     val error: Error = Error()
@@ -42,7 +43,7 @@ class AccountDetailViewModel(
                 account = accountId?.let { accountRepository.getAccount(vaultId, it) }
                     ?: Account(
                         id = "",
-                        tags = tagOptions.firstOrNull()?.let { setOf(it) } ?: setOf()
+                        tags = tagOptions.firstOrNull()?.let { listOf(it) } ?: listOf(),
                     ),
                 tagOptions = tagOptions
             )
@@ -73,11 +74,11 @@ class AccountDetailViewModel(
         }
     }
 
-    fun addTag(tag: String) {
+    fun addTag(tag: Tag) {
         _uiState.update {
             it.copy(
                 account = it.account.copy(
-                    tags = it.account.tags.toMutableSet().apply {
+                    tags = it.account.tags.toMutableList().apply {
                         add(tag)
                     }
                 )
@@ -85,11 +86,11 @@ class AccountDetailViewModel(
         }
     }
 
-    fun removeTag(tag: String) {
+    fun removeTag(tag: Tag) {
         _uiState.update {
             it.copy(
                 account = it.account.copy(
-                    tags = it.account.tags.toMutableSet().apply {
+                    tags = it.account.tags.toMutableList().apply {
                         remove(tag)
                     }
                 )

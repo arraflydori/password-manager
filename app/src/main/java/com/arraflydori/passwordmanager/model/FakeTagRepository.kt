@@ -1,42 +1,35 @@
 package com.arraflydori.passwordmanager.model
 
-import kotlin.random.Random
-
 class FakeTagRepository : TagRepository {
-    private val tagMap = mutableMapOf<String, MutableSet<String>>()
-    private val dummyTags = setOf(
-        "Service",
-        "Finance",
-        "Education",
-        "Government",
-        "Tech",
-        "Social",
-        "Lifestyle",
-        "Entertainment"
-    )
+    private val tagMap = mutableMapOf<String, MutableList<Tag>>()
+    private var idCounter = 0
 
-    override fun getTags(vaultId: String): Set<String> {
-        return tagMap.getOrPut(vaultId) {
-            mutableSetOf<String>().apply {
-                repeat(Random.nextInt(1, dummyTags.size)) {
-                    add(dummyTags.random())
+    override fun getTags(vaultId: String): List<Tag> {
+        return tagMap.getOrPut(vaultId) { mutableListOf() }
+    }
+
+    override fun updateTag(vaultId: String, tag: Tag): Boolean {
+        val tags = tagMap.getOrPut(vaultId) { mutableListOf() }
+        return if (tags.indexOfFirst { it.label == tag.label } != -1) {
+            false
+        } else {
+            if (tag.id.isBlank()) {
+                tags.add(tag.copy(id = (++idCounter).toString()))
+                true
+            } else {
+                val index = tags.indexOfFirst { it.id == tag.id }
+                if (index == -1) {
+                    tags.add(tag)
+                    false
+                } else {
+                    tags[index] = tag
+                    true
                 }
             }
         }
     }
 
-    override fun createTag(vaultId: String, tag: String): Boolean {
-        val tags = tagMap.getOrPut(vaultId) {
-            mutableSetOf<String>().apply {
-                repeat(Random.nextInt(1, dummyTags.size)) {
-                    add(dummyTags.random())
-                }
-            }
-        }
-        return tags.add(tag)
-    }
-
-    override fun deleteTag(vaultId: String, tag: String): Boolean {
+    override fun deleteTag(vaultId: String, tag: Tag): Boolean {
         return tagMap[vaultId]?.remove(tag) == true
     }
 }

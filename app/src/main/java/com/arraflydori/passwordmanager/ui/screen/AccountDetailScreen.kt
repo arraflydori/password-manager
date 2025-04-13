@@ -106,7 +106,7 @@ fun AccountDetailScreen(
                                 viewModel.addTag(tag)
                             },
                             label = {
-                                Text(tag)
+                                Text(tag.label)
                             }
                         )
                     }
@@ -235,7 +235,9 @@ fun AccountDetailScreen(
                             )
                         }
                     }
-                    Spacer(modifier = Modifier.height(16.dp))
+                    if (account.credentials.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                    }
                     for ((i, cred) in account.credentials.withIndex()) {
                         var showPassword by remember { mutableStateOf(false) }
 
@@ -255,6 +257,7 @@ fun AccountDetailScreen(
                                 visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Password,
+                                    // TODO: Fix this
                                     imeAction = if (i != account.credentials.size - 1) ImeAction.Done else ImeAction.Next
                                 ),
                                 trailing = {
@@ -342,7 +345,7 @@ fun AccountDetailScreen(
                                     }
                                 } else null,
                                 label = {
-                                    Text(tag)
+                                    Text(tag.label)
                                 }
                             )
                         }

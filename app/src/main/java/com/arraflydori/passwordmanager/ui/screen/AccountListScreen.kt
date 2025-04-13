@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -65,6 +66,7 @@ import com.arraflydori.passwordmanager.viewmodel.AccountListViewModel
 fun AccountListScreen(
     viewModel: AccountListViewModel,
     onAccountClick: (Account) -> Unit = {},
+    onSettingsClick: (vaultId: String) -> Unit = {},
     onNewAccount: () -> Unit = {},
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -128,6 +130,12 @@ fun AccountListScreen(
                                 .fillMaxWidth()
                                 .graphicsLayer { alpha = 1 - collapsedFraction.value }
                         )
+                    },
+                    actions = {
+                        IconButton(onClick = { onSettingsClick(uiState.vaultId) }) {
+                            Icon(Icons.Default.Settings, contentDescription = "Open vault settings")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
                     },
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors().let {
                         it.copy(scrolledContainerColor = it.containerColor)
