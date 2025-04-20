@@ -94,9 +94,7 @@ class VaultDetailViewModel(
                     tags.filter { tag -> it.tags.none { it.id == tag.id } }
                         .forEach { tag -> tagRepository.deleteTag(vault.id, tag) }
                 }
-                it.tags.forEach { tag ->
-                    tagRepository.updateTag(vault.id, tag)
-                }
+                tagRepository.updateTags(vault.id, it.tags)
                 it.copy(saveSuccess = true)
             } else {
                 it.copy(saveSuccess = false)

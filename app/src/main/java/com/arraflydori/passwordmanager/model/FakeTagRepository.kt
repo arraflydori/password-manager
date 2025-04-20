@@ -8,25 +8,23 @@ class FakeTagRepository : TagRepository {
         return tagMap.getOrPut(vaultId) { mutableListOf() }
     }
 
-    override fun updateTag(vaultId: String, tag: Tag): Boolean {
-        val tags = tagMap.getOrPut(vaultId) { mutableListOf() }
-        return if (tags.indexOfFirst { it.label == tag.label } != -1) {
-            false
-        } else {
-            if (tag.id.isBlank()) {
-                tags.add(tag.copy(id = (++idCounter).toString()))
-                true
-            } else {
-                val index = tags.indexOfFirst { it.id == tag.id }
-                if (index == -1) {
-                    tags.add(tag)
-                    false
-                } else {
-                    tags[index] = tag
-                    true
-                }
-            }
+    override fun updateTags(vaultId: String, tags: List<Tag>): Boolean {
+        val currentTags = tagMap.getOrPut(vaultId) { mutableListOf() }
+
+        // Simulate the updated tag list.
+        val updatedMap = currentTags.associateBy { it.id }.toMutableMap()
+        for (tag in tags) {
+            val id = if (tag.id.isEmpty()) (++idCounter).toString() else tag.id
+            updatedMap[id] = if (id == tag.id) tag else tag.copy(id)
         }
+
+        // Check for unique labels across the updated state.
+        val updatedLabels = updatedMap.values.map { it.label }
+        if (updatedLabels.size != updatedLabels.toSet().size) return false
+
+        // Apply the updates.
+        tagMap[vaultId] = updatedMap.values.toMutableList()
+        return true
     }
 
     override fun deleteTag(vaultId: String, tag: Tag): Boolean {
