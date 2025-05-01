@@ -1,11 +1,14 @@
 package com.arraflydori.passwordmanager
 
 import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.hasScrollAction
 import androidx.compose.ui.test.hasScrollToIndexAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
+import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onParent
@@ -33,7 +36,7 @@ import org.junit.runner.RunWith
 
 @OptIn(ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
-class AccountE2ETest {
+class E2ETest {
     @get:Rule
     val rule = createComposeRule()
 
@@ -43,21 +46,158 @@ class AccountE2ETest {
 
     @Before
     fun setUp() {
-        vaultRepository = FakeVaultRepository().apply {
-            updateVault(Vault(id = "1", name = "TestVault"))
-        }
+        vaultRepository = FakeVaultRepository()
         accountRepository = FakeAccountRepository()
-        tagRepository = FakeTagRepository().apply {
-            updateTags(
-                vaultId = "1",
-                tags = (0..9).map { Tag(id = it.toString(), label = it.toString()) }
-            )
+        tagRepository = FakeTagRepository()
+    }
+
+    @Test
+    fun createVault_AddsVaultToList() {
+        rule.apply {
+            val name = "Test"
+            val description =
+                "Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet."
+            val tags = ('a'..'e').map { it.toString() }
+            setContent {
+                App(
+                    vaultRepository = vaultRepository,
+                    accountRepository = accountRepository,
+                    tagRepository = tagRepository,
+                )
+            }
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithContentDescription("Add vault")
+                .performClick()
+            onNodeWithText("Name", useUnmergedTree = true)
+                .onParent()
+                .performTextInput(name)
+            onNodeWithText("Description", useUnmergedTree = true)
+                .onParent()
+                .performTextInput(description)
+            for (tag in tags) {
+                onAllNodesWithText("Tag", useUnmergedTree = true).apply {
+                    if (fetchSemanticsNodes().isEmpty()) {
+                        onNodeWithContentDescription("Add tag").performClick()
+                    }
+                }
+                    .onLast()
+                    .performScrollTo()
+                    .onParent()
+                    .performTextInput(tag)
+            }
+            onNodeWithText("Save").performScrollTo().performClick()
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText(name).assertExists()
+            onNodeWithText(description, substring = true).assertExists()
+        }
+    }
+
+    @Test
+    fun openVault_displayCorrectVault() {
+        vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
+        tagRepository.updateTags(
+            vaultId = "1",
+            tags = listOf(Tag(id = "a", label = "A"))
+        )
+        rule.apply {
+            setContent {
+                App(
+                    vaultRepository = vaultRepository,
+                    accountRepository = accountRepository,
+                    tagRepository = tagRepository,
+                )
+            }
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText("Foo").performClick()
+            waitUntilExactlyOneExists(hasText("Search account"))
+            onNodeWithText("A").assertExists()
+            onNodeWithText("No accounts yet.").assertExists()
+            onNodeWithContentDescription("Open vault settings").performClick()
+            waitUntilExactlyOneExists(hasText("Vault"))
+            onNodeWithText("Foo").assertExists()
+            onNodeWithText("A").assertExists()
+        }
+    }
+
+    @Test
+    fun editVault_updatesVaultData() {
+        vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
+        tagRepository.updateTags(
+            vaultId = "1",
+            tags = listOf(Tag(id = "a", label = "A"))
+        )
+        rule.apply {
+            setContent {
+                App(
+                    vaultRepository = vaultRepository,
+                    accountRepository = accountRepository,
+                    tagRepository = tagRepository,
+                )
+            }
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText("Foo").performClick()
+            waitUntilExactlyOneExists(hasText("Search account"))
+            onNodeWithContentDescription("Open vault settings").performClick()
+            waitUntilExactlyOneExists(hasText("Vault"))
+            onNodeWithText("Foo").performTextReplacement("FooBar")
+            onNodeWithText("Description", useUnmergedTree = true)
+                .onParent()
+                .performTextInput("Lorem ipsum dolor.")
+            onNodeWithText("A")
+                .performTextReplacement("0")
+            for (tag in (1..9)) {
+                onNodeWithContentDescription("Add tag").performClick()
+                onAllNodesWithText("Tag", useUnmergedTree = true)
+                    .onLast()
+                    .performScrollTo()
+                    .onParent()
+                    .performTextInput(tag.toString())
+            }
+            onNodeWithText("Save").performScrollTo().performClick()
+            waitUntilExactlyOneExists(hasText("Search account"))
+            for (tag in (0..9)) {
+                onNode(hasScrollAction()).performScrollToIndex(tag)
+                onNodeWithText(tag.toString()).assertExists()
+            }
+            onNodeWithContentDescription("Open vault settings").performClick()
+            waitUntilExactlyOneExists(hasText("Vault"))
+            onNodeWithText("FooBar").assertExists()
+            onNodeWithText("Lorem ipsum dolor.").assertExists()
+        }
+    }
+
+    @Test
+    fun deleteVault_removesVaultFromList() {
+        vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
+        tagRepository.updateTags(
+            vaultId = "1",
+            tags = listOf(Tag(id = "a", label = "A"))
+        )
+        rule.apply {
+            setContent {
+                App(
+                    vaultRepository = vaultRepository,
+                    accountRepository = accountRepository,
+                    tagRepository = tagRepository,
+                )
+            }
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText("Foo").performClick()
+            waitUntilExactlyOneExists(hasText("Search account"))
+            onNodeWithContentDescription("Open vault settings").performClick()
+            waitUntilExactlyOneExists(hasText("Vault"))
+            onNodeWithContentDescription("Delete vault").performClick()
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText("Foo").assertDoesNotExist()
         }
     }
 
     @Test
     fun openVault_showsEmptyTextIfNoAccountYet() {
         rule.apply {
+            vaultRepository.apply {
+                updateVault(Vault(id = "1", name = "TestVault"))
+            }
             setContent {
                 App(
                     vaultRepository = vaultRepository,
@@ -74,6 +214,15 @@ class AccountE2ETest {
 
     @Test
     fun openVault_showsCurrentAccountList() {
+        vaultRepository.apply {
+            updateVault(Vault(id = "1", name = "TestVault"))
+        }
+        tagRepository.apply {
+            updateTags(
+                vaultId = "1",
+                tags = (0..9).map { Tag(id = it.toString(), label = it.toString()) }
+            )
+        }
         val tags = tagRepository.getTags(vaultId = "1")
         accountRepository.apply {
             ('A'..'Z').forEach {
@@ -108,6 +257,15 @@ class AccountE2ETest {
     @Test
     fun createAccount_addsAccountToList() {
         rule.apply {
+            vaultRepository.apply {
+                updateVault(Vault(id = "1", name = "TestVault"))
+            }
+            tagRepository.apply {
+                updateTags(
+                    vaultId = "1",
+                    tags = (0..9).map { Tag(id = it.toString(), label = it.toString()) }
+                )
+            }
             setContent {
                 App(
                     vaultRepository = vaultRepository,
@@ -156,6 +314,15 @@ class AccountE2ETest {
 
     @Test
     fun editAccount_updatesAccountData() {
+        vaultRepository.apply {
+            updateVault(Vault(id = "1", name = "TestVault"))
+        }
+        tagRepository.apply {
+            updateTags(
+                vaultId = "1",
+                tags = (0..9).map { Tag(id = it.toString(), label = it.toString()) }
+            )
+        }
         val tags = tagRepository.getTags(vaultId = "1")
         val oldTag = tags.first()
         val newTag = tags.last()
