@@ -3,6 +3,7 @@ package com.arraflydori.passwordmanager.viewmodel
 import androidx.lifecycle.ViewModel
 import com.arraflydori.passwordmanager.model.Account
 import com.arraflydori.passwordmanager.model.AccountRepository
+import com.arraflydori.passwordmanager.model.Tag
 import com.arraflydori.passwordmanager.model.TagRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,9 +12,9 @@ import kotlinx.coroutines.flow.update
 data class AccountListUiState(
     val vaultId: String,
     val accounts: List<Account> = listOf(),
-    val tags: Set<String> = setOf(),
+    val tags: List<Tag> = listOf(),
     val filteredAccounts: List<Account> = listOf(),
-    val selectedTags: Set<String> = setOf(),
+    val selectedTagIds: Set<String> = setOf(),
     val search: String = "",
 )
 
@@ -29,7 +30,7 @@ class AccountListViewModel(
         _uiState.update {
             it.copy(
                 accounts = accountRepository.getAccounts(vaultId),
-                tags = tagRepository.getTags(vaultId).map { it.label }.toSet()
+                tags = tagRepository.getTags(vaultId)
             )
         }
         search(_uiState.value.search)
@@ -40,11 +41,11 @@ class AccountListViewModel(
             state.copy(
                 search = search,
                 filteredAccounts = state.accounts.let {
-                    if (state.selectedTags.isEmpty()) {
+                    if (state.selectedTagIds.isEmpty()) {
                         it
                     } else {
                         it.filter {
-                            it.tags.any { it.label in state.selectedTags }
+                            it.tagIds.any { it in state.selectedTagIds }
                         }
                     }
                 }.filter {
@@ -56,14 +57,14 @@ class AccountListViewModel(
         }
     }
 
-    fun toggleTagSelection(tag: String) {
+    fun toggleTagSelection(tag: Tag) {
         _uiState.update {
             it.copy(
-                selectedTags = it.selectedTags.toMutableSet().apply {
-                    if (this.contains(tag)) {
-                        remove(tag)
+                selectedTagIds = it.selectedTagIds.toMutableSet().apply {
+                    if (this.contains(tag.id)) {
+                        remove(tag.id)
                     } else {
-                        add(tag)
+                        add(tag.id)
                     }
                 }
             )

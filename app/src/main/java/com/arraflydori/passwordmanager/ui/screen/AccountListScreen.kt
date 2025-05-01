@@ -150,12 +150,12 @@ fun AccountListScreen(
                         val tag = tags[i]
                         if (i > 0) Spacer(modifier = Modifier.width(4.dp))
                         FilterChip(
-                            selected = uiState.selectedTags.contains(tag),
+                            selected = uiState.selectedTagIds.contains(tag.id),
                             onClick = {
                                 viewModel.toggleTagSelection(tag)
                             },
                             label = {
-                                Text(tag)
+                                Text(tag.label)
                             }
                         )
                         if (i < uiState.tags.size - 1) Spacer(modifier = Modifier.width(4.dp))

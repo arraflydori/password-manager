@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 
 data class AccountDetailUiState(
     val account: Account = Account(),
+    val tags: List<Tag> = listOf(),
     val tagOptions: List<Tag> = listOf(),
     val showTagOptions: Boolean = false,
     val saveSuccess: Boolean? = null,
@@ -39,12 +40,14 @@ class AccountDetailViewModel(
     init {
         _uiState.update {
             val tagOptions = tagRepository.getTags(vaultId)
+            val account = accountId?.let { accountRepository.getAccount(vaultId, it) }
+                ?: Account(
+                    id = "",
+                    tagIds = tagOptions.firstOrNull()?.let { listOf(it.id) } ?: listOf(),
+                )
             it.copy(
-                account = accountId?.let { accountRepository.getAccount(vaultId, it) }
-                    ?: Account(
-                        id = "",
-                        tags = tagOptions.firstOrNull()?.let { listOf(it) } ?: listOf(),
-                    ),
+                account = account,
+                tags = tagOptions.filter { it.id in account.tagIds },
                 tagOptions = tagOptions
             )
         }
@@ -78,10 +81,13 @@ class AccountDetailViewModel(
         _uiState.update {
             it.copy(
                 account = it.account.copy(
-                    tags = it.account.tags.toMutableList().apply {
-                        add(tag)
+                    tagIds = it.account.tagIds.toMutableList().apply {
+                        add(tag.id)
                     }
-                )
+                ),
+                tags = it.tags.toMutableList().apply {
+                    add(tag)
+                }
             )
         }
     }
@@ -90,10 +96,13 @@ class AccountDetailViewModel(
         _uiState.update {
             it.copy(
                 account = it.account.copy(
-                    tags = it.account.tags.toMutableList().apply {
-                        remove(tag)
+                    tagIds = it.account.tagIds.toMutableList().apply {
+                        remove(tag.id)
                     }
-                )
+                ),
+                tags = it.tags.toMutableList().apply {
+                    remove(tag)
+                }
             )
         }
     }

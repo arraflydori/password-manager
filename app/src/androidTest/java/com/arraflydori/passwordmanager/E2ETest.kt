@@ -231,7 +231,7 @@ class E2ETest {
                         platformName = it.toString(),
                         username = "test",
                         email = "test@example.com",
-                        tags = listOf(tags.random())
+                        tagIds = listOf(tags.random().id)
                     )
                 )
             }
@@ -341,7 +341,7 @@ class E2ETest {
                                 value = "test1234"
                             )
                         ),
-                        tags = listOf(oldTag)
+                        tagIds = listOf(oldTag.id)
                     )
                 )
             }
@@ -379,4 +379,8 @@ class E2ETest {
             onNodeWithText(newTag.label).assertExists()
         }
     }
+
+    // TODO: Test Tag filtering
+
+    // TODO: Test Tag update effect on Account
 }

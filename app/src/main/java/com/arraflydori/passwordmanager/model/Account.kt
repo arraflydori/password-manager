@@ -11,7 +11,7 @@ data class Account(
     val email: String? = null,
     val note: String = "",
     val credentials: List<Credential> = listOf(),
-    val tags: List<Tag> = listOf(),
+    val tagIds: List<String> = listOf(),
 )
 
 @Serializable

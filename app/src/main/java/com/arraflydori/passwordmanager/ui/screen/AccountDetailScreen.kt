@@ -64,7 +64,7 @@ fun AccountDetailScreen(
     onBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val availableTags = uiState.tagOptions.filter { !uiState.account.tags.contains(it) }
+    val availableTags = uiState.tagOptions.filter { !uiState.tags.contains(it) }
 
     LaunchedEffect(uiState.saveSuccess) {
         if (uiState.saveSuccess == true) onSaveSuccess(uiState.account)
@@ -328,8 +328,8 @@ fun AccountDetailScreen(
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        val canRemove = uiState.account.tags.size > 1
-                        for (tag in uiState.account.tags) {
+                        val canRemove = uiState.tags.size > 1
+                        for (tag in uiState.tags) {
                             FilterChip(
                                 selected = true,
                                 onClick = {
