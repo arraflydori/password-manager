@@ -380,7 +380,57 @@ class E2ETest {
         }
     }
 
-    // TODO: Test Tag filtering
-
-    // TODO: Test Tag update effect on Account
+    @Test
+    fun filterTag_showsOnlyAccountsWithThatTag() {
+        vaultRepository.apply {
+            updateVault(Vault(id = "1", name = "TestVault"))
+        }
+        tagRepository.apply {
+            updateTags(
+                vaultId = "1",
+                tags = (0..9).map { Tag(id = it.toString(), label = it.toString()) }
+            )
+        }
+        val tags = tagRepository.getTags(vaultId = "1")
+        val tag1 = tags[0]
+        val tag2 = tags[1]
+        accountRepository.apply {
+            ('A'..'Z').forEachIndexed { i, c ->
+                updateAccount(
+                    vaultId = "1", account = Account(
+                        platformName = c.toString(),
+                        username = "test",
+                        email = "test@example.com",
+                        tagIds = mutableListOf<String>(tag1.id).apply {
+                            if (i % 3 == 0) add(tag2.id)
+                        }
+                    )
+                )
+            }
+        }
+        val tag2Accounts = accountRepository.getAccounts(vaultId = "1").filter {
+            it.tagIds.contains(tag2.id)
+        }
+        rule.apply {
+            setContent {
+                App(
+                    vaultRepository = vaultRepository,
+                    accountRepository = accountRepository,
+                    tagRepository = tagRepository,
+                )
+            }
+            waitUntilExactlyOneExists(hasText("Vaults"))
+            onNodeWithText("TestVault").performClick()
+            waitUntilExactlyOneExists(hasText("Search account"))
+            onNodeWithText(tag2.label).performClick()
+            tag2Accounts.forEachIndexed { i, account ->
+                onNode(hasScrollToIndexAction()).performScrollToIndex(i)
+                onNodeWithText(account.platformName.toString()).performClick()
+                waitUntilExactlyOneExists(hasText("Account"))
+                onNodeWithText(tag2.label).assertExists()
+                onNodeWithContentDescription("Go back").performClick()
+                waitUntilExactlyOneExists(hasText("Search account"))
+            }
+        }
+    }
 }
