@@ -1,4 +1,7 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.data
+
+import com.arraflydori.passwordmanager.domain.Tag
+import com.arraflydori.passwordmanager.domain.TagRepository
 
 class FakeTagRepository : TagRepository {
     private val tagMap = mutableMapOf<String, MutableList<Tag>>()

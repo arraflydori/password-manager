@@ -1,4 +1,4 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.domain
 
 interface TagRepository {
     fun getTags(vaultId: String): List<Tag>

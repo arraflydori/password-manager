@@ -1,4 +1,7 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.data
+
+import com.arraflydori.passwordmanager.domain.Account
+import com.arraflydori.passwordmanager.domain.AccountRepository
 
 class FakeAccountRepository : AccountRepository {
     private val accountMap = mutableMapOf<String, MutableList<Account>>()

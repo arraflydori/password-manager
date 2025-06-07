@@ -1,4 +1,4 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.domain
 
 interface VaultRepository {
     fun getVaults(): List<Vault>

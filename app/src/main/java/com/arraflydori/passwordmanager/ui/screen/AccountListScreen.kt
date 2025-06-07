@@ -57,7 +57,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arraflydori.passwordmanager.model.Account
+import com.arraflydori.passwordmanager.domain.Account
 import com.arraflydori.passwordmanager.ui.composable.MyTextField
 import com.arraflydori.passwordmanager.viewmodel.AccountListViewModel
 

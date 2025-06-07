@@ -1,8 +1,8 @@
 package com.arraflydori.passwordmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.arraflydori.passwordmanager.model.Vault
-import com.arraflydori.passwordmanager.model.VaultRepository
+import com.arraflydori.passwordmanager.domain.Vault
+import com.arraflydori.passwordmanager.domain.VaultRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

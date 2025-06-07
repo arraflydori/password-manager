@@ -1,5 +1,7 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.data
 
+import com.arraflydori.passwordmanager.domain.Vault
+import com.arraflydori.passwordmanager.domain.VaultRepository
 import kotlinx.datetime.Clock
 
 class FakeVaultRepository : VaultRepository {

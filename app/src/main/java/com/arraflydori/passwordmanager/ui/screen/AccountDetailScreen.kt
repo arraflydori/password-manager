@@ -51,8 +51,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import com.arraflydori.passwordmanager.model.Account
-import com.arraflydori.passwordmanager.model.CredentialType
+import com.arraflydori.passwordmanager.domain.Account
+import com.arraflydori.passwordmanager.domain.CredentialType
 import com.arraflydori.passwordmanager.ui.composable.MyTextField
 import com.arraflydori.passwordmanager.viewmodel.AccountDetailViewModel
 

@@ -1,10 +1,10 @@
 package com.arraflydori.passwordmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
-import com.arraflydori.passwordmanager.model.Account
-import com.arraflydori.passwordmanager.model.AccountRepository
-import com.arraflydori.passwordmanager.model.Tag
-import com.arraflydori.passwordmanager.model.TagRepository
+import com.arraflydori.passwordmanager.domain.Account
+import com.arraflydori.passwordmanager.domain.AccountRepository
+import com.arraflydori.passwordmanager.domain.Tag
+import com.arraflydori.passwordmanager.domain.TagRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update

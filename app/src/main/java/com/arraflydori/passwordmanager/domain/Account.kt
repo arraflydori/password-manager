@@ -1,4 +1,4 @@
-package com.arraflydori.passwordmanager.model
+package com.arraflydori.passwordmanager.domain
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

@@ -49,7 +49,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.arraflydori.passwordmanager.model.Vault
+import com.arraflydori.passwordmanager.domain.Vault
 import com.arraflydori.passwordmanager.viewmodel.VaultListViewModel
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
