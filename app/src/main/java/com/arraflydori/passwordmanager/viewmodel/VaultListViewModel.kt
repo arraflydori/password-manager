@@ -1,11 +1,13 @@
 package com.arraflydori.passwordmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.arraflydori.passwordmanager.domain.Vault
 import com.arraflydori.passwordmanager.domain.VaultRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class VaultListUiState(
     val vaults: List<Vault> = listOf(),
@@ -18,8 +20,10 @@ class VaultListViewModel(
     val uiState = _uiState.asStateFlow()
 
     fun loadVaults() {
-        _uiState.update {
-            it.copy(vaults = vaultRepository.getVaults())
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(vaults = vaultRepository.getVaults())
+            }
         }
     }
 }

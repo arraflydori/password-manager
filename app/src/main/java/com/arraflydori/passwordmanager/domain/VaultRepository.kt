@@ -1,8 +1,8 @@
 package com.arraflydori.passwordmanager.domain
 
 interface VaultRepository {
-    fun getVaults(): List<Vault>
-    fun getVault(id: String): Vault?
-    fun updateVault(vault: Vault): Vault?
-    fun deleteVault(id: String): Boolean
+    suspend fun getVaults(): List<Vault>
+    suspend fun getVault(id: String): Vault?
+    suspend fun updateVault(vault: Vault): Vault?
+    suspend fun deleteVault(id: String): Boolean
 }

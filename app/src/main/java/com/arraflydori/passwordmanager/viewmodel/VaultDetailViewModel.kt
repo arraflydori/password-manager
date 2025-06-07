@@ -1,6 +1,7 @@
 package com.arraflydori.passwordmanager.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.arraflydori.passwordmanager.domain.Tag
 import com.arraflydori.passwordmanager.domain.TagRepository
 import com.arraflydori.passwordmanager.domain.Vault
@@ -8,6 +9,7 @@ import com.arraflydori.passwordmanager.domain.VaultRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 data class VaultDetailUiState(
     val vault: Vault = Vault(),
@@ -31,13 +33,15 @@ class VaultDetailViewModel(
     private var oldTags: List<Tag>? = vaultId?.let { tagRepository.getTags(it) }
 
     init {
-        _uiState.update {
-            it.copy(
-                vault = vaultId?.let { vaultRepository.getVault(vaultId) } ?: Vault(),
-                tags = oldTags ?: listOf()
-            )
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    vault = vaultId?.let { vaultRepository.getVault(vaultId) } ?: Vault(),
+                    tags = oldTags ?: listOf()
+                )
+            }
+            if (_uiState.value.tags.isEmpty()) createTag()
         }
-        if (_uiState.value.tags.isEmpty()) createTag()
     }
 
     fun update(
@@ -80,24 +84,28 @@ class VaultDetailViewModel(
     }
 
     fun deleteVault() {
-        vaultRepository.deleteVault(_uiState.value.vault.id)
-        _uiState.update {
-            it.copy(deleteSuccess = true)
+        viewModelScope.launch {
+            vaultRepository.deleteVault(_uiState.value.vault.id)
+            _uiState.update {
+                it.copy(deleteSuccess = true)
+            }
         }
     }
 
     fun save() {
-        _uiState.update {
-            val vault = vaultRepository.updateVault(it.vault)
-            if (vault != null) {
-                oldTags?.let { tags ->
-                    tags.filter { tag -> it.tags.none { it.id == tag.id } }
-                        .forEach { tag -> tagRepository.deleteTag(vault.id, tag) }
+        viewModelScope.launch {
+            _uiState.update {
+                val vault = vaultRepository.updateVault(it.vault)
+                if (vault != null) {
+                    oldTags?.let { tags ->
+                        tags.filter { tag -> it.tags.none { it.id == tag.id } }
+                            .forEach { tag -> tagRepository.deleteTag(vault.id, tag) }
+                    }
+                    tagRepository.updateTags(vault.id, it.tags)
+                    it.copy(saveSuccess = true)
+                } else {
+                    it.copy(saveSuccess = false)
                 }
-                tagRepository.updateTags(vault.id, it.tags)
-                it.copy(saveSuccess = true)
-            } else {
-                it.copy(saveSuccess = false)
             }
         }
     }

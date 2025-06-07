@@ -29,6 +29,7 @@ import com.arraflydori.passwordmanager.domain.Tag
 import com.arraflydori.passwordmanager.domain.TagRepository
 import com.arraflydori.passwordmanager.domain.Vault
 import com.arraflydori.passwordmanager.domain.VaultRepository
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -52,7 +53,7 @@ class E2ETest {
     }
 
     @Test
-    fun createVault_AddsVaultToList() {
+    fun createVault_AddsVaultToList() = runTest {
         rule.apply {
             val name = "Test"
             val description =
@@ -93,7 +94,7 @@ class E2ETest {
     }
 
     @Test
-    fun openVault_displayCorrectVault() {
+    fun openVault_displayCorrectVault() = runTest {
         vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
         tagRepository.updateTags(
             vaultId = "1",
@@ -120,7 +121,7 @@ class E2ETest {
     }
 
     @Test
-    fun editVault_updatesVaultData() {
+    fun editVault_updatesVaultData() = runTest {
         vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
         tagRepository.updateTags(
             vaultId = "1",
@@ -167,7 +168,7 @@ class E2ETest {
     }
 
     @Test
-    fun deleteVault_removesVaultFromList() {
+    fun deleteVault_removesVaultFromList() = runTest {
         vaultRepository.updateVault(Vault(id = "1", name = "Foo"))
         tagRepository.updateTags(
             vaultId = "1",
@@ -193,7 +194,7 @@ class E2ETest {
     }
 
     @Test
-    fun openVault_showsEmptyTextIfNoAccountYet() {
+    fun openVault_showsEmptyTextIfNoAccountYet() = runTest {
         rule.apply {
             vaultRepository.apply {
                 updateVault(Vault(id = "1", name = "TestVault"))
@@ -213,7 +214,7 @@ class E2ETest {
     }
 
     @Test
-    fun openVault_showsCurrentAccountList() {
+    fun openVault_showsCurrentAccountList() = runTest {
         vaultRepository.apply {
             updateVault(Vault(id = "1", name = "TestVault"))
         }
@@ -255,7 +256,7 @@ class E2ETest {
     }
 
     @Test
-    fun createAccount_addsAccountToList() {
+    fun createAccount_addsAccountToList() = runTest {
         rule.apply {
             vaultRepository.apply {
                 updateVault(Vault(id = "1", name = "TestVault"))
@@ -313,7 +314,7 @@ class E2ETest {
     }
 
     @Test
-    fun editAccount_updatesAccountData() {
+    fun editAccount_updatesAccountData() = runTest {
         vaultRepository.apply {
             updateVault(Vault(id = "1", name = "TestVault"))
         }
@@ -381,7 +382,7 @@ class E2ETest {
     }
 
     @Test
-    fun filterTag_showsOnlyAccountsWithThatTag() {
+    fun filterTag_showsOnlyAccountsWithThatTag() = runTest {
         vaultRepository.apply {
             updateVault(Vault(id = "1", name = "TestVault"))
         }

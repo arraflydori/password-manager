@@ -19,9 +19,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.arraflydori.passwordmanager.data.AppDatabase
+import com.arraflydori.passwordmanager.data.DefaultVaultRepository
 import com.arraflydori.passwordmanager.data.FakeAccountRepository
 import com.arraflydori.passwordmanager.data.FakeTagRepository
-import com.arraflydori.passwordmanager.data.FakeVaultRepository
 import com.arraflydori.passwordmanager.domain.AccountRepository
 import com.arraflydori.passwordmanager.domain.TagRepository
 import com.arraflydori.passwordmanager.domain.VaultRepository
@@ -36,13 +37,17 @@ import com.arraflydori.passwordmanager.viewmodel.VaultDetailViewModel
 import com.arraflydori.passwordmanager.viewmodel.VaultListViewModel
 
 class MainActivity : ComponentActivity() {
+    private val db: AppDatabase
+        get() = (application as App).db
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         enableEdgeToEdge()
         setContent {
             PasswordManagerTheme {
                 App(
-                    vaultRepository = FakeVaultRepository(),
+                    vaultRepository = DefaultVaultRepository(dao = db.vaultDao()),
                     accountRepository = FakeAccountRepository(),
                     tagRepository = FakeTagRepository(),
                 )

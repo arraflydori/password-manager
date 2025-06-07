@@ -8,15 +8,15 @@ class FakeVaultRepository : VaultRepository {
     private val vaults = mutableListOf<Vault>()
     private var idCounter = 0
 
-    override fun getVaults(): List<Vault> {
+    override suspend fun getVaults(): List<Vault> {
         return vaults
     }
 
-    override fun getVault(id: String): Vault? {
+    override suspend fun getVault(id: String): Vault? {
         return vaults.firstOrNull { it.id == id }
     }
 
-    override fun updateVault(vault: Vault): Vault? {
+    override suspend fun updateVault(vault: Vault): Vault? {
         vault.copy(lastUpdate = Clock.System.now()).let {
             return if (it.id.isBlank()) {
                 val vault = it.copy(id = (++idCounter).toString())
@@ -35,7 +35,7 @@ class FakeVaultRepository : VaultRepository {
         }
     }
 
-    override fun deleteVault(id: String): Boolean {
+    override suspend fun deleteVault(id: String): Boolean {
         return vaults.removeIf { it.id == id }
     }
 }
