@@ -69,6 +69,8 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     ksp(libs.androidx.room.compiler)
     implementation(libs.androidx.room.ktx)
+    implementation(libs.sqlcipher.android)
+    implementation(libs.androidx.sqlite.ktx)
 
 
     testImplementation(libs.junit)
